@@ -1,0 +1,56 @@
+---
+import Base from "./Base.astro";
+import Toc from "../components/Toc.astro";
+import { withBase } from "../lib/paths";
+import type { MarkdownHeading } from "astro";
+
+interface Neighbor {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  title: string;
+  number: string | null;
+  kicker?: string;
+  secId?: string | null;
+  headings: MarkdownHeading[];
+  prev: Neighbor | null;
+  next: Neighbor | null;
+}
+
+const { title, number, kicker, secId, headings, prev, next } = Astro.props;
+const label = number ? `Chapter ${number}` : kicker || "";
+---
+
+<Base title={title} chapterTitle={title}>
+  <div class="page">
+    <Toc headings={headings} />
+    <article class="chapter" id="main">
+      {label && <p class="chapter-kicker">{label}</p>}
+      <h1 class="chapter-title" id={secId || undefined}>{title}</h1>
+      <slot />
+      <nav class="chapter-nav" aria-label="Adjacent chapters">
+        {prev ? (
+          <a href={withBase(prev.href)}>
+            <span class="dir">Previous</span>
+            {prev.title}
+          </a>
+        ) : (
+          <span></span>
+        )}
+        {next && (
+          <a class="next" href={withBase(next.href)}>
+            <span class="dir">Next</span>
+            {next.title}
+          </a>
+        )}
+      </nav>
+    </article>
+  </div>
+  <script>
+    if (document.querySelector("[data-interactive]")) {
+      import("../interactives/register").then((m) => m.hydrateInteractives());
+    }
+  </script>
+</Base>

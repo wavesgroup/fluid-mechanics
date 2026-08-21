@@ -1,0 +1,33 @@
+---
+import ThemePicker from "./ThemePicker.svelte";
+import { withBase, PDF_URL, BOOK_TITLE } from "../lib/paths";
+
+interface Props {
+  chapterTitle?: string;
+}
+
+const { chapterTitle } = Astro.props;
+---
+
+<header class="site-header">
+  <a class="brand" href={withBase("/")}>{BOOK_TITLE.replace(" for Atmosphere and Ocean Scientists", "")}</a>
+  {chapterTitle && <div class="header-chapter">{chapterTitle}</div>}
+  <div class="header-actions">
+    <button class="toc-toggle" type="button" data-toc-toggle hidden>Contents</button>
+    <a href={PDF_URL}>PDF</a>
+    <ThemePicker client:load />
+  </div>
+</header>
+
+<script>
+  const btn = document.querySelector("[data-toc-toggle]");
+  if (btn) {
+    const page = () => document.querySelector(".page");
+    if (page()?.querySelector(".toc")) {
+      btn.removeAttribute("hidden");
+      btn.addEventListener("click", () => {
+        page()?.classList.toggle("show-toc");
+      });
+    }
+  }
+</script>

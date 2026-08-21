@@ -1,0 +1,38 @@
+---
+import { render } from "astro:content";
+import Chapter from "../layouts/Chapter.astro";
+import { allChapters, chapterHref } from "../lib/nav";
+
+export async function getStaticPaths() {
+  const chapters = await allChapters();
+  return chapters.map((ch, i) => ({
+    params: { slug: ch.id },
+    props: {
+      ch,
+      prev: i > 0 ? chapters[i - 1] : null,
+      next: i < chapters.length - 1 ? chapters[i + 1] : null,
+    },
+  }));
+}
+
+const { ch, prev, next } = Astro.props;
+const { Content, headings } = await render(ch);
+const kicker =
+  ch.data.kind === "appendix"
+    ? `Appendix ${ch.data.number}`
+    : ch.data.kind === "front"
+      ? "Front matter"
+      : undefined;
+---
+
+<Chapter
+  title={ch.data.title}
+  number={ch.data.kind === "chapter" ? ch.data.number : null}
+  kicker={kicker}
+  secId={ch.data.label}
+  headings={headings}
+  prev={prev ? { href: chapterHref(prev), title: prev.data.title } : { href: "/", title: "Home" }}
+  next={next ? { href: chapterHref(next), title: next.data.title } : { href: "/references", title: "References" }}
+>
+  <Content />
+</Chapter>
