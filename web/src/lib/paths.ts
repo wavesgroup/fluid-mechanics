@@ -5,8 +5,5 @@ export function withBase(path: string): string {
   return `${prefix}${p}` || "/";
 }
 
-export const PDF_URL =
-  "https://raw.githubusercontent.com/wavesgroup/fluid-mechanics-notes/artifacts/fluid-mechanics-book.pdf";
-
 export const BOOK_TITLE = "Fluid Mechanics for Atmosphere and Ocean Scientists";
 export const BOOK_AUTHOR = "Milan Curcic";

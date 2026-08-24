@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { allChapters, chapterHref, chapterLabel } from "../lib/nav";
-import { withBase, PDF_URL, BOOK_TITLE, BOOK_AUTHOR } from "../lib/paths";
+import { withBase, BOOK_TITLE, BOOK_AUTHOR } from "../lib/paths";
 
 const chapters = await allChapters();
 ---
@@ -13,7 +13,7 @@ const chapters = await allChapters();
     <p class="author">{BOOK_AUTHOR}</p>
     <div class="actions">
       <a href={withBase("/preface")}>Start reading</a>
-      <a href={PDF_URL}>Download PDF</a>
+      <a href={withBase("/print") + "?autoprint=1"} target="_blank" rel="noopener noreferrer">Download PDF</a>
     </div>
     <p class="dedication">For Chris Piasecki, who understood the word “ocean”</p>
     <h2>Contents</h2>

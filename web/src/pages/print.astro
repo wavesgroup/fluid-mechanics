@@ -1,0 +1,150 @@
+---
+import { render } from "astro:content";
+import Print from "../layouts/Print.astro";
+import { allChapters, type Chapter } from "../lib/nav";
+import { withBase, BOOK_TITLE, BOOK_AUTHOR } from "../lib/paths";
+import bib from "../data/bib.json";
+import terms from "../data/index-terms.json";
+
+type BibEntry = {
+  cite: string;
+  authors: string[];
+  title: string;
+  journal?: string;
+  volume?: string;
+  pages?: string;
+  publisher?: string;
+  year?: string;
+};
+
+type Term = { term: string; sub: string | null; slug: string; anchor: string };
+
+function chapterKicker(ch: Chapter): string {
+  if (ch.data.kind === "appendix") return `Appendix ${ch.data.number}`;
+  if (ch.data.kind === "front") return "Front matter";
+  if (ch.data.number) return `Chapter ${ch.data.number}`;
+  return "";
+}
+
+const chapters = await allChapters();
+const rendered = await Promise.all(
+  chapters.map(async (ch) => {
+    const { Content } = await render(ch);
+    return { ch, Content };
+  }),
+);
+
+const entries = Object.entries(bib as Record<string, BibEntry>).sort((a, b) =>
+  a[1].cite.localeCompare(b[1].cite),
+);
+
+const grouped = new Map<string, Term[]>();
+for (const t of terms as Term[]) {
+  const letter = (t.term[0] || "#").toUpperCase();
+  const key = /[A-Z]/.test(letter) ? letter : "#";
+  if (!grouped.has(key)) grouped.set(key, []);
+  grouped.get(key)!.push(t);
+}
+const letters = [...grouped.keys()].sort();
+---
+
+<Print>
+  <header class="print-titlepage">
+    <img
+      class="cover"
+      src={withBase("/cover.png")}
+      alt={`Book cover: ${BOOK_TITLE}`}
+    />
+    <h1>{BOOK_TITLE}</h1>
+    <p class="author">{BOOK_AUTHOR}</p>
+    <p class="dedication">For Chris Piasecki, who understood the word “ocean”</p>
+  </header>
+
+  <nav class="print-toc" aria-label="Table of contents">
+    <h2>Contents</h2>
+    <ol class="contents-list">
+      {
+        chapters.map((ch) => (
+          <li>
+            <span class="num">{ch.data.number ?? ""}</span>
+            <a href={`#${ch.id}`}>{ch.data.title}</a>
+          </li>
+        ))
+      }
+      <li>
+        <span class="num"></span>
+        <a href="#references">References</a>
+      </li>
+      <li>
+        <span class="num"></span>
+        <a href="#book-index">Index</a>
+      </li>
+    </ol>
+  </nav>
+
+  {
+    rendered.map(({ ch, Content }) => {
+      const kicker = chapterKicker(ch);
+      return (
+        <article
+          class="print-chapter chapter"
+          id={ch.id}
+          data-title={ch.data.title}
+        >
+          {kicker && <p class="chapter-kicker">{kicker}</p>}
+          <h1 class="chapter-title" id={ch.data.label || undefined}>
+            {ch.data.title}
+          </h1>
+          <Content />
+        </article>
+      );
+    })
+  }
+
+  <article class="print-chapter chapter" id="references" data-title="References">
+    <p class="chapter-kicker">Back matter</p>
+    <h1 class="chapter-title">References</h1>
+    <dl class="refs">
+      {
+        entries.map(([key, e]) => (
+          <div id={key.toLowerCase()}>
+            <dt>{e.cite}</dt>
+            <dd>
+              {e.authors.join(", ")}.
+              <em>{e.title}</em>.
+              {e.journal && ` ${e.journal}`}
+              {e.volume && ` ${e.volume}`}
+              {e.pages && `, ${e.pages}`}
+              {e.publisher && !e.journal && ` ${e.publisher}`}
+              {e.year && ` (${e.year})`}.
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </article>
+
+  <article class="print-chapter chapter" id="book-index" data-title="Index">
+    <p class="chapter-kicker">Back matter</p>
+    <h1 class="chapter-title">Index</h1>
+    <div class="index-list">
+      {
+        letters.map((letter) => (
+          <section>
+            <h3>{letter}</h3>
+            <ul>
+              {grouped.get(letter)!.map((t) => (
+                <li>
+                  <a href={`#${t.anchor || t.slug}`}>
+                    {t.term}
+                    {t.sub ? `, ${t.sub}` : ""}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </article>
+</Print>

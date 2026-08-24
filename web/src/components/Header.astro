@@ -1,6 +1,6 @@
 ---
 import ThemePicker from "./ThemePicker.svelte";
-import { withBase, PDF_URL, BOOK_TITLE } from "../lib/paths";
+import { withBase, BOOK_TITLE } from "../lib/paths";
 
 interface Props {
   chapterTitle?: string;
@@ -14,7 +14,7 @@ const { chapterTitle } = Astro.props;
   {chapterTitle && <div class="header-chapter">{chapterTitle}</div>}
   <div class="header-actions">
     <button class="toc-toggle" type="button" data-toc-toggle hidden>Contents</button>
-    <a href={PDF_URL}>PDF</a>
+    <a href={withBase("/print")} target="_blank" rel="noopener noreferrer">PDF</a>
     <ThemePicker client:load />
   </div>
 </header>
