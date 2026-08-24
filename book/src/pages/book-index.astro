@@ -1,0 +1,48 @@
+---
+import Base from "../layouts/Base.astro";
+import terms from "../data/index-terms.json";
+import { withBase } from "../lib/paths";
+
+type Term = { term: string; sub: string | null; slug: string; anchor: string };
+
+const grouped = new Map<string, Term[]>();
+for (const t of terms as Term[]) {
+  const letter = (t.term[0] || "#").toUpperCase();
+  const key = /[A-Z]/.test(letter) ? letter : "#";
+  if (!grouped.has(key)) grouped.set(key, []);
+  grouped.get(key)!.push(t);
+}
+const letters = [...grouped.keys()].sort();
+---
+
+<Base title="Index" chapterTitle="Index">
+  <main class="home" id="main">
+    <p class="chapter-kicker">Back matter</p>
+    <h1 class="chapter-title">Index</h1>
+    <div class="index-list">
+      {
+        letters.map((letter) => (
+          <section>
+            <h3>{letter}</h3>
+            <ul>
+              {grouped.get(letter)!.map((t) => (
+                <li>
+                  <a href={withBase(`/${t.slug}`) + (t.anchor ? `#${t.anchor}` : "")}>
+                    {t.term}
+                    {t.sub ? `, ${t.sub}` : ""}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+    <nav class="chapter-nav">
+      <a href={withBase("/references")}>
+        <span class="dir">Previous</span>
+        References
+      </a>
+    </nav>
+  </main>
+</Base>

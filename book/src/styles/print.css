@@ -1,0 +1,232 @@
+@page {
+  size: letter;
+  margin: 22mm 18mm 24mm 18mm;
+
+  @top-left {
+    content: "Fluid Mechanics for Atmosphere and Ocean Scientists";
+    font-family: "Source Sans 3 Variable", "Source Sans 3", system-ui, sans-serif;
+    font-size: 8pt;
+    color: #5e574c;
+  }
+
+  @bottom-center {
+    content: counter(page);
+    font-family: "Source Sans 3 Variable", "Source Sans 3", system-ui, sans-serif;
+    font-size: 9pt;
+    color: #5e574c;
+  }
+}
+
+@page :first {
+  @top-left {
+    content: none;
+  }
+
+  @bottom-center {
+    content: none;
+  }
+}
+
+.print-body {
+  margin: 0;
+}
+
+.print-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.1rem;
+  padding: 0.7rem var(--page-pad);
+  background: color-mix(in srgb, var(--header-bg) 92%, transparent);
+  border-bottom: 1px solid var(--rule);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+
+.print-back {
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.print-back:hover {
+  color: var(--accent);
+}
+
+.print-hint {
+  flex: 1 1 16rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.print-toolbar button {
+  margin-left: auto;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--bg);
+  background: var(--fg);
+  border: 1px solid var(--fg);
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+}
+
+.print-toolbar button:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.print-toolbar button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+#print-book {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1.75rem var(--page-pad) 4.5rem;
+}
+
+.print-titlepage {
+  text-align: center;
+}
+
+.print-titlepage .cover {
+  display: block;
+  width: min(100%, 22rem);
+  margin: 0 auto 1.75rem;
+  border: 1px solid var(--rule);
+  box-shadow: 0 12px 40px var(--shadow);
+}
+
+.print-titlepage h1 {
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  line-height: 1.15;
+  text-wrap: balance;
+  margin: 0 0 0.4rem;
+}
+
+.print-titlepage .author {
+  font-family: var(--font-ui);
+  color: var(--muted);
+  margin: 0 0 1.2rem;
+}
+
+.print-titlepage .dedication {
+  font-style: italic;
+  color: var(--muted);
+  margin: 1.8rem 0 0;
+}
+
+.print-toc {
+  margin-top: 3rem;
+}
+
+.print-toc h2 {
+  font-size: 1.38rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.print-chapter {
+  margin-top: 3.5rem;
+}
+
+.print-root .interactive,
+.print-root .interactive-slot {
+  display: none !important;
+}
+
+@media print {
+  html.print-root {
+    --bg: #fff;
+    --header-bg: #fff;
+    --nav-bg: #fff;
+    --plot-bg: transparent;
+    --code-bg: transparent;
+    --shadow: transparent;
+    background: #fff !important;
+    color: #000;
+    print-color-adjust: economy;
+    -webkit-print-color-adjust: economy;
+  }
+
+  html.print-root body,
+  html.print-root #print-book {
+    background: #fff !important;
+  }
+
+  .print-toolbar {
+    display: none !important;
+  }
+
+  #print-book {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .print-toc,
+  .print-chapter {
+    break-before: page;
+    margin-top: 0;
+  }
+
+  .print-titlepage .cover {
+    box-shadow: none;
+  }
+
+  html.print-root .book-figure img {
+    background: transparent;
+    border-color: #ccc;
+  }
+
+  /* Zero-height section markers are not valid PDF destinations. */
+  html.print-root .sec-anchor {
+    display: block;
+    height: 1px;
+    overflow: visible;
+  }
+
+  .display-math,
+  .katex-display,
+  figure,
+  pre,
+  table {
+    break-inside: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Keep in-document refs as real PDF links (Chrome matches <a href="#…">). */
+  html.print-root a[href^="#"] {
+    color: var(--link);
+    text-decoration: underline;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .display-math,
+  .katex-display {
+    overflow-x: visible;
+  }
+
+  /* Chrome can drop KaTeX fraction/rule lines when printing. */
+  .katex .mfrac .frac-line,
+  .katex .overline .overline-line,
+  .katex .underline .underline-line,
+  .katex .hline,
+  .katex .hdashline,
+  .katex .rule {
+    min-height: 1px;
+  }
+}

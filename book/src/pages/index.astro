@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+import { allChapters, chapterHref, chapterLabel } from "../lib/nav";
+import { withBase, BOOK_TITLE, BOOK_AUTHOR } from "../lib/paths";
+
+const chapters = await allChapters();
+---
+
+<Base description="A graduate textbook on fluid mechanics for atmosphere and ocean scientists.">
+  <main class="home" id="main">
+    <img class="cover" src={withBase("/cover.png")} alt="Book cover: Fluid Mechanics for Atmosphere and Ocean Scientists" />
+    <h1>{BOOK_TITLE}</h1>
+    <p class="author">{BOOK_AUTHOR}</p>
+    <div class="actions">
+      <a href={withBase("/preface")}>Start reading</a>
+      <a href={withBase("/print") + "?autoprint=1"} target="_blank" rel="noopener noreferrer">Download PDF</a>
+    </div>
+    <p class="dedication">For Chris Piasecki, who understood the word “ocean”</p>
+    <h2>Contents</h2>
+    <ol class="contents-list">
+      {
+        chapters.map((ch) => (
+          <li>
+            <span class="num">{ch.data.number ?? ""}</span>
+            <a href={withBase(chapterHref(ch))}>{ch.data.title}</a>
+          </li>
+        ))
+      }
+      <li>
+        <span class="num"></span>
+        <a href={withBase("/references")}>References</a>
+      </li>
+      <li>
+        <span class="num"></span>
+        <a href={withBase("/book-index")}>Index</a>
+      </li>
+    </ol>
+  </main>
+</Base>

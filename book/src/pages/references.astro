@@ -1,0 +1,42 @@
+---
+import Base from "../layouts/Base.astro";
+import bib from "../data/bib.json";
+import { withBase } from "../lib/paths";
+
+const entries = Object.entries(bib).sort((a, b) => a[1].cite.localeCompare(b[1].cite));
+---
+
+<Base title="References" chapterTitle="References">
+  <main class="home" id="main">
+    <p class="chapter-kicker">Back matter</p>
+    <h1 class="chapter-title">References</h1>
+    <dl class="refs">
+      {
+        entries.map(([key, e]) => (
+          <div id={key.toLowerCase()}>
+            <dt>{e.cite}</dt>
+            <dd>
+              {e.authors.join(", ")}.
+              <em>{e.title}</em>.
+              {e.journal && ` ${e.journal}`}
+              {e.volume && ` ${e.volume}`}
+              {e.pages && `, ${e.pages}`}
+              {e.publisher && !e.journal && ` ${e.publisher}`}
+              {e.year && ` (${e.year})`}.
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+    <nav class="chapter-nav">
+      <a href={withBase("/symbols")}>
+        <span class="dir">Previous</span>
+        Definition of symbols
+      </a>
+      <a class="next" href={withBase("/book-index")}>
+        <span class="dir">Next</span>
+        Index
+      </a>
+    </nav>
+  </main>
+</Base>

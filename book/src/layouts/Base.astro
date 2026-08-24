@@ -1,0 +1,50 @@
+---
+import "@fontsource-variable/source-serif-4/wght.css";
+import "@fontsource-variable/source-serif-4/wght-italic.css";
+import "@fontsource-variable/source-sans-3/wght.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "katex/dist/katex.min.css";
+import "../styles/themes.css";
+import "../styles/book.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { BOOK_TITLE } from "../lib/paths";
+
+interface Props {
+  title?: string;
+  description?: string;
+  chapterTitle?: string;
+}
+
+const { title, description, chapterTitle } = Astro.props;
+const pageTitle = title ? `${title} — ${BOOK_TITLE}` : BOOK_TITLE;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    {description && <meta name="description" content={description} />}
+    <title>{pageTitle}</title>
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("fm-theme");
+          var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var theme = stored || (dark ? "ink" : "paper");
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "paper");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header chapterTitle={chapterTitle} />
+    <slot />
+    <Footer />
+  </body>
+</html>

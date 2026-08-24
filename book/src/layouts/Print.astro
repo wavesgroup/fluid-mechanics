@@ -1,0 +1,44 @@
+---
+import "@fontsource-variable/source-serif-4/wght.css";
+import "@fontsource-variable/source-serif-4/wght-italic.css";
+import "@fontsource-variable/source-sans-3/wght.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "katex/dist/katex.min.css";
+import "../styles/themes.css";
+import "../styles/book.css";
+import "../styles/print.css";
+import { BOOK_TITLE, withBase } from "../lib/paths";
+
+const pageTitle = `Print — ${BOOK_TITLE}`;
+---
+
+<!doctype html>
+<html lang="en" class="print-root" data-theme="paper">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta
+      name="description"
+      content={`Printable edition of ${BOOK_TITLE}. Use Save as PDF in the print dialog.`}
+    />
+    <title>{pageTitle}</title>
+  </head>
+  <body class="print-body">
+    <div class="print-toolbar">
+      <a class="print-back" href={withBase("/")}>Back to book</a>
+      <p class="print-hint">
+        Choose “Save as PDF” in the print dialog, and uncheck “Headers and footers”
+        so the browser’s URL and date do not stack on the page numbers.
+      </p>
+      <button type="button" data-print-book disabled>Preparing…</button>
+    </div>
+    <div id="print-book">
+      <slot />
+    </div>
+    <script>
+      import { initPrintBook } from "../lib/print-book";
+      initPrintBook();
+    </script>
+  </body>
+</html>

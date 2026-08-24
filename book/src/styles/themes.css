@@ -1,0 +1,91 @@
+/* Theme tokens. Applied via html[data-theme]. */
+
+html[data-theme="paper"] {
+  color-scheme: light;
+  --bg: #f3eee4;
+  --fg: #1c1915;
+  --muted: #5e574c;
+  --accent: #8a2e2e;
+  --rule: #d3c9b6;
+  --code-bg: #e8e0d0;
+  --nav-bg: #ebe4d6;
+  --header-bg: #f3eee4;
+  --plot-bg: #f7f3eb;
+  --link: #7a2828;
+  --shadow: rgb(28 25 21 / 0.08);
+}
+
+html[data-theme="folio"] {
+  color-scheme: light;
+  --bg: #fbfbf9;
+  --fg: #171717;
+  --muted: #5a5a5a;
+  --accent: #0b3d5c;
+  --rule: #d8d8d2;
+  --code-bg: #f0f0ea;
+  --nav-bg: #f4f4f0;
+  --header-bg: #fbfbf9;
+  --plot-bg: #ffffff;
+  --link: #0b3d5c;
+  --shadow: rgb(0 0 0 / 0.06);
+}
+
+html[data-theme="solarized-light"] {
+  color-scheme: light;
+  --bg: #fdf6e3;
+  --fg: #073642;
+  --muted: #657b83;
+  --accent: #b58900;
+  --rule: #eee8d5;
+  --code-bg: #eee8d5;
+  --nav-bg: #f4edd8;
+  --header-bg: #fdf6e3;
+  --plot-bg: #fdf6e3;
+  --link: #268bd2;
+  --shadow: rgb(7 54 66 / 0.08);
+}
+
+html[data-theme="ink"] {
+  color-scheme: dark;
+  --bg: #161310;
+  --fg: #e7dfd2;
+  --muted: #b3a894;
+  --accent: #d4a574;
+  --rule: #3a342c;
+  --code-bg: #221e19;
+  --nav-bg: #1c1915;
+  --header-bg: #161310;
+  --plot-bg: #1c1915;
+  --link: #e0b07a;
+  --shadow: rgb(0 0 0 / 0.35);
+}
+
+html[data-theme="nord"] {
+  color-scheme: dark;
+  --bg: #2e3440;
+  --fg: #eceff4;
+  --muted: #d8dee9;
+  --accent: #88c0d0;
+  --rule: #3b4252;
+  --code-bg: #3b4252;
+  --nav-bg: #3b4252;
+  --header-bg: #2e3440;
+  --plot-bg: #3b4252;
+  --link: #88c0d0;
+  --shadow: rgb(0 0 0 / 0.3);
+}
+
+html[data-theme="solarized-dark"] {
+  color-scheme: dark;
+  --bg: #002b36;
+  --fg: #eee8d5;
+  --muted: #93a1a1;
+  --accent: #cb4b16;
+  --rule: #073642;
+  --code-bg: #073642;
+  --nav-bg: #073642;
+  --header-bg: #002b36;
+  --plot-bg: #073642;
+  --link: #2aa198;
+  --shadow: rgb(0 0 0 / 0.35);
+}

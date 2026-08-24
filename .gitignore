@@ -1,0 +1,19 @@
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.cut
+*.fdb_latexmk
+*.fls
+*.idx
+*.ind
+*.ilg
+*.log
+*.out
+*.toc
+*.pdf
+
+# HTML book
+book/node_modules/
+book/dist/
+book/.astro/

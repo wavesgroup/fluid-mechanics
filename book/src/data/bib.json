@@ -1,0 +1,240 @@
+{
+  "booij1999third": {
+    "type": "article",
+    "title": "A third-generation wave model for coastal regions: 1. Model description and validation",
+    "authors": [
+      "NRRC Booij",
+      "Roeland C Ris",
+      "Leo H Holthuijsen"
+    ],
+    "year": "1999",
+    "journal": "Journal of geophysical research: Oceans",
+    "publisher": "Wiley Online Library",
+    "volume": "104",
+    "pages": "7649--7666",
+    "cite": "Booij et al., 1999",
+    "narrative": "Booij et al."
+  },
+  "curcic2016hurricane": {
+    "type": "article",
+    "title": "Hurricane-induced ocean waves and stokes drift and their impacts on surface transport and dispersion in the Gulf of Mexico",
+    "authors": [
+      "Milan Curcic",
+      "Shuyi S Chen",
+      "Tamay M Özgökmen"
+    ],
+    "year": "2016",
+    "journal": "Geophysical Research Letters",
+    "publisher": "Wiley Online Library",
+    "volume": "43",
+    "pages": "2773--2781",
+    "cite": "Curcic et al., 2016",
+    "narrative": "Curcic et al."
+  },
+  "dean1991water": {
+    "type": "book",
+    "title": "Water wave mechanics for engineers and scientists",
+    "authors": [
+      "Robert G Dean",
+      "Robert A Dalrymple"
+    ],
+    "year": "1991",
+    "journal": "",
+    "publisher": "world scientific publishing company",
+    "volume": "2",
+    "pages": "",
+    "cite": "Dean and Dalrymple, 1991",
+    "narrative": "Dean and Dalrymple"
+  },
+  "donelan2012modeling": {
+    "type": "article",
+    "title": "Modeling waves and wind stress",
+    "authors": [
+      "MA Donelan",
+      "M Curcic",
+      "1S S Chen",
+      "AK Magnusson"
+    ],
+    "year": "2012",
+    "journal": "Journal of Geophysical Research: Oceans",
+    "publisher": "Wiley Online Library",
+    "volume": "117",
+    "pages": "",
+    "cite": "Donelan et al., 2012",
+    "narrative": "Donelan et al."
+  },
+  "kim1987turbulence": {
+    "type": "article",
+    "title": "Turbulence statistics in fully developed channel flow at low Reynolds number",
+    "authors": [
+      "John Kim",
+      "Parviz Moin",
+      "Robert Moser"
+    ],
+    "year": "1987",
+    "journal": "Journal of fluid mechanics",
+    "publisher": "Cambridge University Press",
+    "volume": "177",
+    "pages": "133--166",
+    "cite": "Kim et al., 1987",
+    "narrative": "Kim et al."
+  },
+  "kolmogorov1941local": {
+    "type": "article",
+    "title": "The local structure of turbulence in incompressible viscous fluid for very large Reynolds",
+    "authors": [
+      "Andrey Nikolaevich Kolmogorov"
+    ],
+    "year": "1941",
+    "journal": "Numbers. In Dokl. Akad. Nauk SSSR",
+    "publisher": "",
+    "volume": "30",
+    "pages": "301",
+    "cite": "Kolmogorov, 1941",
+    "narrative": "Kolmogorov"
+  },
+  "kolmogorov1962refinement": {
+    "type": "article",
+    "title": "A refinement of previous hypotheses concerning the local structure of turbulence in a viscous incompressible fluid at high Reynolds number",
+    "authors": [
+      "Andrey Nikolaevich Kolmogorov"
+    ],
+    "year": "1962",
+    "journal": "Journal of Fluid Mechanics",
+    "publisher": "Cambridge University Press",
+    "volume": "13",
+    "pages": "82--85",
+    "cite": "Kolmogorov, 1962",
+    "narrative": "Kolmogorov"
+  },
+  "kundu2024fluid": {
+    "type": "book",
+    "title": "Fluid mechanics",
+    "authors": [
+      "Pijush K Kundu",
+      "Ira M Cohen",
+      "David R Dowling",
+      "Jesse Capecelatro"
+    ],
+    "year": "2024",
+    "journal": "",
+    "publisher": "Elsevier",
+    "volume": "",
+    "pages": "",
+    "cite": "Kundu et al., 2024",
+    "narrative": "Kundu et al."
+  },
+  "pope2001turbulent": {
+    "type": "article",
+    "title": "Turbulent flows",
+    "authors": [
+      "Stephen B Pope"
+    ],
+    "year": "2001",
+    "journal": "Measurement Science and Technology",
+    "publisher": "",
+    "volume": "12",
+    "pages": "2020--2021",
+    "cite": "Pope, 2001",
+    "narrative": "Pope"
+  },
+  "prandtl1925": {
+    "type": "article",
+    "title": "Bericht über Untersuchungen zur ausgebildeten Turbulenz",
+    "authors": [
+      "Ludwig Prandtl"
+    ],
+    "year": "1925",
+    "journal": "ZAMM-Journal of Applied Mathematics and Mechanics/Zeitschrift für Angewandte Mathematik und Mechanik",
+    "publisher": "Wiley Online Library",
+    "volume": "5",
+    "pages": "136--139",
+    "cite": "Prandtl, 1925",
+    "narrative": "Prandtl"
+  },
+  "richardson1920supply": {
+    "type": "article",
+    "title": "The supply of energy from and to atmospheric eddies",
+    "authors": [
+      "Lewis Fry Richardson"
+    ],
+    "year": "1920",
+    "journal": "Proceedings of the Royal Society of London. Series A, Containing Papers of a Mathematical and Physical Character",
+    "publisher": "The Royal Society London",
+    "volume": "97",
+    "pages": "354--373",
+    "cite": "Richardson, 1920",
+    "narrative": "Richardson"
+  },
+  "tolman1991third": {
+    "type": "article",
+    "title": "A third-generation model for wind waves on slowly varying, unsteady, and inhomogeneous depths and currents",
+    "authors": [
+      "Hendrik L Tolman"
+    ],
+    "year": "1991",
+    "journal": "Journal of Physical Oceanography",
+    "publisher": "",
+    "volume": "21",
+    "pages": "782--797",
+    "cite": "Tolman, 1991",
+    "narrative": "Tolman"
+  },
+  "vallis2017atmospheric": {
+    "type": "book",
+    "title": "Atmospheric and oceanic fluid dynamics",
+    "authors": [
+      "Geoffrey K Vallis"
+    ],
+    "year": "2017",
+    "journal": "",
+    "publisher": "Cambridge University Press",
+    "volume": "",
+    "pages": "",
+    "cite": "Vallis, 2017",
+    "narrative": "Vallis"
+  },
+  "vallis2019essentials": {
+    "type": "book",
+    "title": "Essentials of atmospheric and oceanic dynamics",
+    "authors": [
+      "Geoffrey K Vallis"
+    ],
+    "year": "2019",
+    "journal": "",
+    "publisher": "Cambridge university press",
+    "volume": "",
+    "pages": "",
+    "cite": "Vallis, 2019",
+    "narrative": "Vallis"
+  },
+  "group1988wam": {
+    "type": "article",
+    "title": "The WAM model—A third generation ocean wave prediction model",
+    "authors": [
+      "The WAMDI Group"
+    ],
+    "year": "1988",
+    "journal": "Journal of physical oceanography",
+    "publisher": "",
+    "volume": "18",
+    "pages": "1775--1810",
+    "cite": "Group, 1988",
+    "narrative": "Group"
+  },
+  "wei1989reynolds": {
+    "type": "article",
+    "title": "Reynolds-number effects on the structure of a turbulent channel flow",
+    "authors": [
+      "Tao Wei",
+      "WW Willmarth"
+    ],
+    "year": "1989",
+    "journal": "Journal of Fluid Mechanics",
+    "publisher": "Cambridge University Press",
+    "volume": "204",
+    "pages": "57--95",
+    "cite": "Wei and Willmarth, 1989",
+    "narrative": "Wei and Willmarth"
+  }
+}
