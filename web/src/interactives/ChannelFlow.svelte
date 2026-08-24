@@ -19,6 +19,7 @@
     const zn = z.map((zi) => zi / (2 * delta));
     svg = svgLineChart({
       theme,
+      title: "Laminar channel flow",
       xlabel: "ū (m/s)",
       ylabel: "z / (2δ)",
       xlim: [0, Math.max(0.25, Math.max(...vel) * 1.05)],

@@ -52,6 +52,14 @@ export function formatTick(v: number): string {
   return v.toPrecision(3).replace(/\.?0+$/, "");
 }
 
+function escapeXml(s: string): string {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
 type Series = {
   x: number[];
   y: number[];
@@ -64,6 +72,7 @@ export function svgLineChart(opts: {
   series: Series[];
   xlabel: string;
   ylabel: string;
+  title?: string;
   xlim?: [number, number];
   ylim?: [number, number];
   width?: number;
@@ -150,7 +159,9 @@ export function svgLineChart(opts: {
     return `<path d="${d}" fill="none" stroke="${s.color || theme.accent}" stroke-width="${s.width ?? 2}" ${dash} />`;
   });
 
-  return `<svg viewBox="0 0 ${width} ${height}" role="img">
+  const title = escapeXml(opts.title || `${opts.xlabel} versus ${opts.ylabel}`);
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}">
+    <title>${title}</title>
     ${grid.join("")}
     ${axes}
     ${lines.join("")}

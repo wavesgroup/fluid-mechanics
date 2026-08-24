@@ -18,6 +18,7 @@
     const fDeep = k.map((ki) => Math.sqrt(g * ki) / (2 * Math.PI));
     svg = svgLineChart({
       theme,
+      title: "Wave dispersion",
       xlabel: "Frequency (Hz)",
       ylabel: "Wavenumber (rad/m)",
       xlim: [0, 5],

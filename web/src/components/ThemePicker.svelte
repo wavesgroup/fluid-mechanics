@@ -43,7 +43,7 @@
       <button
         type="button"
         role="option"
-        aria-current={t.id === theme}
+        aria-selected={t.id === theme}
         onclick={() => apply(t.id)}
       >
         <span class="swatch" style:background={t.swatch}></span>

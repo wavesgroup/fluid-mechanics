@@ -45,15 +45,15 @@ export function rehypeBook({ chaptersDir, bibPath, base = "/" } = {}) {
 
   return (tree, file) => {
     const labels = collectLabels(chaptersDir);
-    const slug = path.basename(String(file.path || file.history?.[0] || ""), ".md");
-    const raw = fs.existsSync(file.path)
-      ? fs.readFileSync(file.path, "utf8")
+    const sourcePath = file.path || file.history?.[0];
+    const slug = path.basename(String(sourcePath || ""), ".md");
+    const raw = sourcePath && fs.existsSync(sourcePath)
+      ? fs.readFileSync(sourcePath, "utf8")
       : "";
     const numberMatch = raw.match(/^number:\s*(?:null|"([^"]+)")/m);
     const prefix = numberMatch ? (numberMatch[1] ?? null) : null;
 
     let eqCounter = 0;
-    const eqByIndex = [];
 
     visit(tree, "element", (node) => {
       const cls = node.properties?.className;
@@ -62,7 +62,6 @@ export function rehypeBook({ chaptersDir, bibPath, base = "/" } = {}) {
       if (classes.includes("display-math")) {
         eqCounter += 1;
         const display = prefix ? `${prefix}.${eqCounter}` : String(eqCounter);
-        eqByIndex.push(display);
         const num = {
           type: "element",
           tagName: "span",

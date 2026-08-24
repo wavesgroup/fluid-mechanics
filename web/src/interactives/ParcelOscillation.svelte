@@ -22,6 +22,7 @@
     const z = t.map((ti) => parcel(z0, n2, ti));
     svg = svgLineChart({
       theme,
+      title: "Parcel oscillation",
       xlabel: "Time (h)",
       ylabel: "δz (m)",
       xlim: [0, 6],
