@@ -1,8 +1,8 @@
 # OCE 575/675 (Fluid Mechanics) Syllabus
 
 * **Instructor**: Prof. Milan Curcic (mcurcic@miami.edu)
-* **When**: Mondays & Wednesdays 9-10:15
-* **Where**: MSC 329
+* **When**: Tuesdays & Thursdays 12-1:15pm
+* **Where**: N117
 * **Office hours**: By appointment
 
 ## Description
@@ -29,13 +29,7 @@ wave kinematics; wave-induced orbital velocities; Stokes drift.
 ## Textbooks
 
 Lecture notes are available at
-[https://github.com/wavesgroup/fluid-mechanics-notes](https://github.com/wavesgroup/fluid-mechanics-notes).
-
-Further, these textbooks will be used as useful reference material but are not a
-required course expense.
-
-* _Fluid Mechanics, 7th ed_ by Kundu, Cohen, Downling & Capecelatro
-* _Essentials of Atmospheric and Oceanic Dynamics_ by Geoffrey Vallis
+[https://github.com/wavesgroup/fluid-mechanics](https://github.com/wavesgroup/fluid-mechanics).
 
 ## Learning outcomes
 
