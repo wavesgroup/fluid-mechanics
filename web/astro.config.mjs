@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
 import svelte from "@astrojs/svelte";
+import { unified } from "@astrojs/markdown-remark";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
@@ -15,32 +16,35 @@ export default defineConfig({
   site: "https://wavesgroup.github.io",
   base,
   output: "static",
+  compressHTML: true,
   integrations: [svelte()],
   markdown: {
+    processor: unified({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [
+        [
+          rehypeKatex,
+          {
+            strict: "ignore",
+            throwOnError: false,
+            macros: {
+              "\\boldsymbol": "\\mathbf",
+            },
+          },
+        ],
+        rehypeRaw,
+        [
+          rehypeBook,
+          {
+            chaptersDir: path.join(root, "src/chapters"),
+            bibPath: path.join(root, "src/data/bib.json"),
+            base,
+          },
+        ],
+      ],
+    }),
     shikiConfig: {
       theme: "css-variables",
     },
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [
-      [
-        rehypeKatex,
-        {
-          strict: "ignore",
-          throwOnError: false,
-          macros: {
-            "\\boldsymbol": "\\mathbf",
-          },
-        },
-      ],
-      rehypeRaw,
-      [
-        rehypeBook,
-        {
-          chaptersDir: path.join(root, "src/chapters"),
-          bibPath: path.join(root, "src/data/bib.json"),
-          base,
-        },
-      ],
-    ],
   },
 });
