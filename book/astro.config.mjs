@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const githubPages = process.env.GITHUB_PAGES === "true";
-const base = githubPages ? "/fluid-mechanics-notes" : "/";
+const base = githubPages ? "/fluid-mechanics" : "/";
 
 export default defineConfig({
   site: "https://wavesgroup.github.io",
