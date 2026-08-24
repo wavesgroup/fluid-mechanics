@@ -13,7 +13,7 @@
 *.toc
 *.pdf
 
-# Web book
-web/node_modules/
-web/dist/
-web/.astro/
+# HTML book
+book/node_modules/
+book/dist/
+book/.astro/

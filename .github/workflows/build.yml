@@ -27,10 +27,10 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: book/package-lock.json
 
       - name: Install and build
-        working-directory: web
+        working-directory: book
         env:
           GITHUB_PAGES: "true"
         run: |
@@ -41,7 +41,7 @@ jobs:
         if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web/dist
+          path: book/dist
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

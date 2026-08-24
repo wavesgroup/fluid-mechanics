@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert fluid-mechanics-book.tex into Markdown chapters for the web book."""
+"""Convert fluid-mechanics-book.tex into Markdown chapters for the HTML book."""
 
 from __future__ import annotations
 
@@ -14,10 +14,10 @@ ROOT = Path(__file__).resolve().parents[2]
 TEX_PATH = ROOT / "fluid-mechanics-book.tex"
 BIB_PATH = ROOT / "references.bib"
 ASSETS = ROOT / "assets"
-OUT_CHAPTERS = ROOT / "web" / "src" / "chapters"
-OUT_DATA = ROOT / "web" / "src" / "data"
-OUT_FIGURES = ROOT / "web" / "public" / "figures"
-OUT_PUBLIC = ROOT / "web" / "public"
+OUT_CHAPTERS = ROOT / "book" / "src" / "chapters"
+OUT_DATA = ROOT / "book" / "src" / "data"
+OUT_FIGURES = ROOT / "book" / "public" / "figures"
+OUT_PUBLIC = ROOT / "book" / "public"
 
 SLUGS = {
     "Preface": "preface",
