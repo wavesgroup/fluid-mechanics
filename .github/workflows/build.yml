@@ -2,64 +2,55 @@ name: build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up TeX Live
-      run: |
-        sudo apt update
-        sudo apt install -y texlive-latex-{base,recommended,extra}
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
-    - name: Compile LaTeX document
-      run: |
-        make
+      - name: Install and build
+        working-directory: web
+        env:
+          GITHUB_PAGES: "true"
+        run: |
+          npm ci
+          npm run build
 
-    - name: Publish PDF to artifacts branch
-      run: |
-        set -euo pipefail
-        PDF=fluid-mechanics-book.pdf
-        test -f "$PDF"
+      - name: Upload Pages artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
 
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-        if [ -d artifacts ]; then
-          git worktree prune || true
-          rm -rf artifacts
-        fi
-
-        if git ls-remote --exit-code origin refs/heads/artifacts >/dev/null 2>&1; then
-          git fetch origin artifacts
-          # Create (or reset) local branch 'artifacts' tracking remote and attach worktree
-          git worktree add -B artifacts artifacts origin/artifacts
-        else
-          git worktree add -b artifacts artifacts
-          find artifacts -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
-        fi
-
-        if [ -f artifacts/$PDF ] && cmp -s "$PDF" artifacts/$PDF; then
-          echo "No PDF changes."
-          exit 0
-        fi
-
-        cp "$PDF" artifacts/$PDF
-        cd artifacts
-        git add "$PDF"
-        git commit -m "Update $PDF from ${GITHUB_SHA}"
-        git push origin artifacts
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
