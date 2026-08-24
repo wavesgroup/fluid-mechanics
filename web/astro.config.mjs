@@ -5,6 +5,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import { rehypeBook } from "./src/plugins/rehype-book.mjs";
+import { rehypeMathInHtml } from "./src/plugins/rehype-math-in-html.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +23,8 @@ export default defineConfig({
     processor: unified({
       remarkPlugins: [remarkMath],
       rehypePlugins: [
+        rehypeRaw,
+        rehypeMathInHtml,
         [
           rehypeKatex,
           {
@@ -32,7 +35,6 @@ export default defineConfig({
             },
           },
         ],
-        rehypeRaw,
         [
           rehypeBook,
           {
