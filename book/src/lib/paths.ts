@@ -7,3 +7,4 @@ export function withBase(path: string): string {
 
 export const BOOK_TITLE = "Fluid Mechanics for Atmosphere and Ocean Scientists";
 export const BOOK_AUTHOR = "Milan Curcic";
+export const BOOK_REPO = "https://github.com/wavesgroup/fluid-mechanics";
