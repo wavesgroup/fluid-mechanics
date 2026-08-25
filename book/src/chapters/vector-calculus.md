@@ -216,6 +216,8 @@ magnitudes.
 It can be useful to think of a dot product as collapsing the two vectors into a
 single scalar that contains contributions from each of their components.
 
+<div class="interactive-slot" data-interactive="dot-product"></div>
+
 The following listing shows how to manually compute the dot product of two
 vectors in Python using the built-in arithmetic operators:
 
@@ -336,6 +338,8 @@ So, the magnitude of the cross product is largest when the two vectors are
 orthogonal.
 Unlike the dot product, the cross product is anticommutative, meaning that
 $\mathbf{a} \times \mathbf{b} = -\mathbf{b} \times \mathbf{a}$.
+
+<div class="interactive-slot" data-interactive="cross-product"></div>
 
 In fluid mechanics, a cross product will often come up when we are interested in
 the rotation of a vector field.
