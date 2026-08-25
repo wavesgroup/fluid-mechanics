@@ -1,5 +1,5 @@
 ---
-import { withBase } from "../lib/paths";
+import { withBase, BOOK_REPO } from "../lib/paths";
 ---
 
 <footer class="site-footer">
@@ -15,5 +15,7 @@ import { withBase } from "../lib/paths";
     <a href={withBase("/references")}>References</a>
     ·
     <a href={withBase("/book-index")}>Index</a>
+    ·
+    <a href={BOOK_REPO} target="_blank" rel="noopener noreferrer">GitHub</a>
   </p>
 </footer>
