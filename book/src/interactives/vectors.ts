@@ -232,14 +232,6 @@ export function project3dToWorld(p: Vec3): Vec2 {
   };
 }
 
-export function fitScale3d(points: Vec3[], target = 2.35): number {
-  let m = 0.001;
-  for (const p of points) {
-    m = Math.max(m, Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
-  }
-  return target / m;
-}
-
 export function fmt(n: number, digits = 2): string {
   if (!Number.isFinite(n)) return "—";
   if (Math.abs(n) < 0.5 * 10 ** -digits) return (0).toFixed(digits);

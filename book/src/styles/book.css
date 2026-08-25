@@ -605,6 +605,10 @@ cite {
   pointer-events: none;
 }
 
+.interactive .vector-inset svg {
+  overflow: visible;
+}
+
 .interactive .vector-inset .inset-label {
   font-family: var(--font-ui);
   font-size: 0.7rem;

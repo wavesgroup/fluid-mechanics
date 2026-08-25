@@ -16,7 +16,6 @@
     crossZ,
     eventToWorld,
     fitInView,
-    fitScale3d,
     fmt,
     fmtDeg,
     labelPos,
@@ -86,7 +85,9 @@
     const b3: Vec3 = { x: b.x, y: b.y, z: 0 };
     const c3: Vec3 = { x: 0, y: 0, z: cz };
     const ab: Vec3 = { x: a.x + b.x, y: a.y + b.y, z: 0 };
-    const s = fitScale3d([a3, b3, c3, ab], 2.05);
+    // Same world units as the 2D plot: the plane/axes mark ±3, and a×b is not
+    // rescaled to fit that box, so its length can exceed |a| and |b|.
+    const s = 2.05 / Math.abs(view.max);
     const sc = (p: Vec3): Vec3 => ({ x: p.x * s, y: p.y * s, z: p.z * s });
     const A = sc(a3);
     const B = sc(b3);
