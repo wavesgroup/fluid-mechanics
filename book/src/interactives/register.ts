@@ -2,17 +2,23 @@ import { mount, unmount, type Component } from "svelte";
 import WaveDispersion from "../interactives/WaveDispersion.svelte";
 import ParcelOscillation from "../interactives/ParcelOscillation.svelte";
 import ChannelFlow from "../interactives/ChannelFlow.svelte";
+import DotProduct from "../interactives/DotProduct.svelte";
+import CrossProduct from "../interactives/CrossProduct.svelte";
 
 const registry: Record<string, Component> = {
   "wave-dispersion": WaveDispersion,
   "parcel-oscillation": ParcelOscillation,
   "channel-flow": ChannelFlow,
+  "dot-product": DotProduct,
+  "cross-product": CrossProduct,
 };
 
 const tagNames: Record<string, string> = {
   "wave-dispersion": "fm-wave-dispersion",
   "parcel-oscillation": "fm-parcel-oscillation",
   "channel-flow": "fm-channel-flow",
+  "dot-product": "fm-dot-product",
+  "cross-product": "fm-cross-product",
 };
 
 function defineElements() {

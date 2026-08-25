@@ -551,6 +551,108 @@ cite {
   border-color: var(--accent);
 }
 
+.interactive .interactive-caption {
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: -0.35rem 0 0.75rem;
+  line-height: 1.4;
+}
+
+.interactive .vector-stage {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.interactive .vector-stage.with-inset {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 42rem) {
+  .interactive .vector-stage.with-inset {
+    grid-template-columns: 1fr 13.5rem;
+    align-items: start;
+  }
+}
+
+.interactive .vector-canvas {
+  touch-action: none;
+  user-select: none;
+}
+
+.interactive .vector-canvas.is-dragging {
+  cursor: grabbing;
+}
+
+.interactive .vec-hit {
+  fill: transparent;
+  stroke: none;
+  cursor: grab;
+  touch-action: none;
+}
+
+.interactive .vec-hit:focus {
+  outline: none;
+}
+
+.interactive .vec-hit:focus-visible {
+  stroke: var(--fg);
+  stroke-width: 2;
+  fill: color-mix(in srgb, var(--fg) 12%, transparent);
+}
+
+.interactive .vec-tip {
+  pointer-events: none;
+}
+
+.interactive .vector-inset svg {
+  overflow: visible;
+}
+
+.interactive .vector-inset .inset-label {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.35rem;
+}
+
+.interactive .readout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.18rem 0.85rem;
+  margin: 0.75rem 0 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.interactive .readout span:nth-child(odd) {
+  color: var(--muted);
+}
+
+.interactive .readout .readout-sub {
+  color: var(--muted);
+}
+
+.interactive .vector-callout {
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  color: var(--fg);
+  margin: 0.55rem 0 0;
+}
+
+.interactive .vector-callout.is-zero {
+  color: var(--accent);
+}
+
+.interactive .vector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
 .theme-picker {
   position: relative;
 }
