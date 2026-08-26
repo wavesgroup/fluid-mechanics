@@ -649,15 +649,6 @@ $$
 Some of these identities will come handy when we derive the conservation of
 vorticity laws.
 
-### Computing and visualizing gradient, divergence, and curl
-
-The explorers above evaluate $\nabla T$, $\nabla \cdot \mathbf{u}$, and
-$\nabla \times \mathbf{u}$ from the closed-form derivatives of a few analytic
-fields.
-On a discrete grid the same operators are approximated with finite differences,
-for example $\partial T/\partial x \approx (T_{i+1} - T_{i-1}) / (2 \Delta x)$.
-Exercise 5 asks you to implement that numerically.
-
 ## Gauss and Stokes theorems
 
 The most useful in our work will be variants of the
