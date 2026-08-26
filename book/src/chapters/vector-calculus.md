@@ -512,6 +512,10 @@ steepest increase of that field, and its magnitude is the rate of that increase.
 Imagine hiking up a hill; the gradient of the terrain is a vector
 that is pointing toward the steepest incline, and its magnitude is the steepness
 of that incline.
+Hover or tap the field below to read $T$ and see $\nabla T$:
+the arrow is orthogonal to the isolines and points uphill.
+
+<div class="interactive-slot" data-interactive="gradient-field"></div>
 
 ### Divergence
 
@@ -531,6 +535,11 @@ $$
 Divergence of a vector field is a scalar that describes how much the vector
 field is expanding or contracting at a point.
 Negative divergence is called convergence.
+The explorer below colors the plane by $\nabla \cdot \mathbf{u}$ and draws
+$\mathbf{u}$ as arrows: spreading arrows and warm colors are sources;
+converging arrows and cool colors are sinks.
+
+<div class="interactive-slot" data-interactive="divergence-field"></div>
 
 ### Curl
 
@@ -555,6 +564,11 @@ Curl of a vector field is another vector that is orthogonal to the original
 vector field and quantifies how much the vector field is rotating around a
 point.
 When curl is zero, the vector field is said to be <em>irrotational</em>.
+In two dimensions the curl is out of the plane, $(\nabla \times \mathbf{u})_z$.
+The paddle wheel below spins with that local rotation; shear is a reminder
+that curl need not look like a vortex.
+
+<div class="interactive-slot" data-interactive="curl-field"></div>
 
 ### Laplacian
 
@@ -634,10 +648,6 @@ $$
 
 Some of these identities will come handy when we derive the conservation of
 vorticity laws.
-
-### Computing and visualizing gradient, divergence, and curl
-
-WIP
 
 ## Gauss and Stokes theorems
 
