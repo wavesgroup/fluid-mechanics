@@ -551,6 +551,79 @@ cite {
   border-color: var(--accent);
 }
 
+.interactive button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.interactive-slot[data-interactive="python-playground"]:not([data-hydrated="true"]) {
+  min-height: 16rem;
+  border: 1px dashed var(--rule);
+  background: var(--nav-bg);
+}
+
+.interactive-slot[data-interactive="python-playground"]:not([data-hydrated="true"]) > pre {
+  display: none;
+}
+
+.interactive .python-editor {
+  margin: 0;
+  border: 1px solid var(--rule);
+  background: var(--code-bg);
+  overflow: hidden;
+}
+
+.interactive .python-editor .cm-editor {
+  background: transparent;
+}
+
+.interactive .python-editor .cm-editor.cm-focused {
+  outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: 1px;
+}
+
+.interactive .python-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.interactive .python-status {
+  flex: 1 1 12rem;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.interactive .python-output {
+  margin: 0.65rem 0 0;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.interactive .python-error,
+.interactive .python-stderr {
+  color: var(--accent);
+}
+
+.interactive .python-figures {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.interactive .python-figures img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: var(--plot-bg);
+  border: 1px solid var(--rule);
+}
+
 .interactive .interactive-caption {
   font-family: var(--font-ui);
   font-size: 0.88rem;
