@@ -53,8 +53,15 @@ function formatError(err: unknown): string {
   return trimTraceback(text);
 }
 
+/**
+ * Only the four hex forms CSS and Matplotlib both accept -- #RGB, #RGBA,
+ * #RRGGBB, #RRGGBBAA. Anything else falls back, and the result is interpolated
+ * into a Python string literal below, so this doubles as the injection guard.
+ */
 function hexColor(value: string | undefined, fallback: string): string {
-  if (value && /^#[0-9a-fA-F]{3,8}$/.test(value)) return value;
+  if (value && /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(value)) {
+    return value;
+  }
   return fallback;
 }
 
@@ -175,7 +182,11 @@ async function handleRun(id: number, code: string, theme?: PlotTheme) {
   let figures: string[] = [];
   try {
     const runtime = await loadRuntime(id);
-    await applyTheme(runtime, theme);
+    try {
+      await applyTheme(runtime, theme);
+    } catch {
+      // Cosmetic only -- never fail a reader's run over plot colours.
+    }
     stdoutBuf = "";
     stderrBuf = "";
     try {
