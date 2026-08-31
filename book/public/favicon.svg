@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Fluid Mechanics">
+  <title>Fluid Mechanics</title>
+  <rect width="64" height="64" rx="12" fill="#f3eee4" />
+  <g fill="none" stroke-width="7" stroke-linecap="round">
+    <path d="M10 18c7.3-6 14.7-6 22 0s14.7 6 22 0" stroke="#1c1915" />
+    <path d="M10 32c7.3-6 14.7-6 22 0s14.7 6 22 0" stroke="#8a2e2e" />
+    <path d="M10 46c7.3-6 14.7-6 22 0s14.7 6 22 0" stroke="#1c1915" />
+  </g>
+</svg>

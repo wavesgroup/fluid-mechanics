@@ -556,14 +556,12 @@ cite {
   cursor: not-allowed;
 }
 
-.interactive-slot[data-interactive="python-playground"]:not([data-hydrated="true"]) {
-  min-height: 16rem;
-  border: 1px dashed var(--rule);
-  background: var(--nav-bg);
-}
-
+/* Until the editor mounts -- and for good if scripts never run -- the slot shows
+   its starter code, so the exercises stay readable and copyable. */
 .interactive-slot[data-interactive="python-playground"]:not([data-hydrated="true"]) > pre {
-  display: none;
+  min-height: 16rem;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .interactive .python-editor {
@@ -610,10 +608,21 @@ cite {
   color: var(--accent);
 }
 
+.interactive .python-note {
+  margin: 0.65rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 .interactive .python-figures {
   display: grid;
   gap: 0.65rem;
   margin-top: 0.75rem;
+}
+
+.interactive .python-figures.is-stale {
+  opacity: 0.55;
 }
 
 .interactive .python-figures img {

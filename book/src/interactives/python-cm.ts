@@ -1,4 +1,10 @@
-import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentLess,
+  indentMore,
+} from "@codemirror/commands";
 import { python } from "@codemirror/lang-python";
 import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
@@ -65,6 +71,47 @@ const editorTheme = EditorView.theme({
   },
 });
 
+/**
+ * Tab indents inside the editor, which would otherwise trap keyboard users. Esc
+ * releases it so the next Tab moves focus on as usual; any other key re-arms it.
+ */
+function tabEscapeKeymap() {
+  let released = false;
+  const keys = [
+    {
+      key: "Escape",
+      run: () => {
+        released = true;
+        return true;
+      },
+    },
+    {
+      key: "Tab",
+      run: (view: EditorView) => {
+        if (released) {
+          released = false;
+          return false;
+        }
+        return indentMore(view);
+      },
+      shift: (view: EditorView) => {
+        if (released) {
+          released = false;
+          return false;
+        }
+        return indentLess(view);
+      },
+    },
+  ];
+  const rearm = EditorView.domEventHandlers({
+    keydown: (event) => {
+      if (event.key !== "Tab" && event.key !== "Escape") released = false;
+      return false;
+    },
+  });
+  return [keymap.of(keys), rearm];
+}
+
 export function createPythonEditor(options: {
   parent: HTMLElement;
   doc: string;
@@ -91,14 +138,15 @@ export function createPythonEditor(options: {
               return true;
             },
           },
-          indentWithTab,
-          ...defaultKeymap,
-          ...historyKeymap,
         ]),
+        tabEscapeKeymap(),
+        keymap.of([...defaultKeymap, ...historyKeymap]),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) options.onChange(update.state.doc.toString());
         }),
-        EditorView.contentAttributes.of({ "aria-label": "Python code" }),
+        EditorView.contentAttributes.of({
+          "aria-label": "Python code. Press Escape then Tab to leave the editor.",
+        }),
       ],
     }),
   });

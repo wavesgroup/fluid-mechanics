@@ -19,9 +19,38 @@ function post(msg: WorkerResponse) {
   self.postMessage(msg);
 }
 
+/** Frames from inside Pyodide's own runner, which mean nothing to a reader. */
+function isInternalFrame(file: string): boolean {
+  return file.includes("/_pyodide/") || file.includes("/pyodide/");
+}
+
+/**
+ * Drop the Pyodide plumbing from the top of a traceback so the first frame a
+ * reader sees is their own code.
+ */
+function trimTraceback(text: string): string {
+  if (!text.includes("Traceback (most recent call last)")) return text;
+  const lines = text.split("\n");
+  const kept: string[] = [];
+  let dropping = false;
+  for (const line of lines) {
+    const frame = /^\s+File "([^"]*)", line /.exec(line);
+    if (frame) {
+      dropping = isInternalFrame(frame[1]);
+      if (!dropping) kept.push(line);
+      continue;
+    }
+    // Source/context lines belong to the frame above them.
+    if (dropping && /^\s/.test(line)) continue;
+    dropping = false;
+    kept.push(line);
+  }
+  return kept.join("\n");
+}
+
 function formatError(err: unknown): string {
-  if (err instanceof Error) return err.message || err.toString();
-  return String(err);
+  const text = err instanceof Error ? err.message || err.toString() : String(err);
+  return trimTraceback(text);
 }
 
 function hexColor(value: string | undefined, fallback: string): string {
@@ -37,7 +66,7 @@ async function loadRuntime(id: number): Promise<PyodideAPI> {
     post({ type: "status", id, status: "loading" });
     const { loadPyodide } = (await import(
       /* @vite-ignore */
-      "https://cdn.jsdelivr.net/pyodide/v314.0.6/full/pyodide.mjs"
+      `${PYODIDE_INDEX}pyodide.mjs`
     )) as {
       loadPyodide: (opts?: { indexURL?: string }) => Promise<PyodideAPI>;
     };
@@ -57,6 +86,7 @@ async function loadRuntime(id: number): Promise<PyodideAPI> {
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+_fm_baseline = set(globals().keys()) | {"_fm_baseline"}
 `);
     pyodide = runtime;
     post({ type: "status", id, status: "ready" });
@@ -69,6 +99,19 @@ import matplotlib.pyplot as plt
     loadPromise = null;
     throw err;
   }
+}
+
+/** Forget everything the reader's code defined, without reloading Pyodide. */
+async function resetNamespace(runtime: PyodideAPI) {
+  await runtime.runPythonAsync(`
+_fm_stale = [k for k in list(globals().keys()) if k not in _fm_baseline]
+for _fm_key in _fm_stale:
+    globals().pop(_fm_key, None)
+globals().pop("_fm_stale", None)
+globals().pop("_fm_key", None)
+import matplotlib.pyplot as plt
+plt.close("all")
+`);
 }
 
 async function applyTheme(runtime: PyodideAPI, theme?: PlotTheme) {
@@ -160,34 +203,32 @@ async function handleRun(id: number, code: string, theme?: PlotTheme) {
   });
 }
 
+async function handleReset(id: number) {
+  let error: string | null = null;
+  // Never pull the runtime down just to reset it.
+  if (pyodide) {
+    try {
+      await resetNamespace(pyodide);
+    } catch (err) {
+      error = formatError(err);
+    }
+  }
+  post({
+    type: "result",
+    id,
+    stdout: "",
+    stderr: "",
+    figures: [],
+    error,
+    ready: pyodide !== null,
+  });
+}
+
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   const data = event.data;
   if (!data || typeof data !== "object") return;
-  if (data.type === "init") {
-    try {
-      await loadRuntime(data.id);
-      post({
-        type: "result",
-        id: data.id,
-        stdout: "",
-        stderr: "",
-        figures: [],
-        error: null,
-        ready: true,
-      });
-    } catch (err) {
-      post({
-        type: "result",
-        id: data.id,
-        stdout: "",
-        stderr: "",
-        figures: [],
-        error:
-          formatError(err) ||
-          "Failed to load the Python runtime. Check your network connection and try again.",
-        ready: false,
-      });
-    }
+  if (data.type === "reset") {
+    await handleReset(data.id);
     return;
   }
   if (data.type === "run") {

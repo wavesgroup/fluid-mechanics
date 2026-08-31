@@ -10,7 +10,6 @@ export type RuntimePhase = "idle" | WorkerStatus | "running";
 
 type Pending = {
   resolve: (value: RunResult) => void;
-  reject: (reason: unknown) => void;
 };
 
 let worker: Worker | null = null;
@@ -26,10 +25,6 @@ function setPhase(next: RuntimePhase) {
   for (const listener of statusListeners) listener(phase);
 }
 
-export function getRuntimePhase(): RuntimePhase {
-  return phase;
-}
-
 export function onRuntimePhase(listener: (phase: RuntimePhase) => void): () => void {
   statusListeners.add(listener);
   listener(phase);
@@ -43,6 +38,7 @@ function onWorkerMessage(event: MessageEvent<WorkerResponse>) {
   if (!data || typeof data !== "object") return;
   if (data.type === "status") {
     if (data.status === "loading" && phase !== "running") setPhase("loading");
+    // Only a run triggers the download, so finishing it means execution starts.
     if (data.status === "ready" && phase === "loading") setPhase("running");
     return;
   }
@@ -60,6 +56,13 @@ function onWorkerMessage(event: MessageEvent<WorkerResponse>) {
   }
 }
 
+function settleAll(result: RunResult) {
+  for (const [id, waiter] of pending) {
+    pending.delete(id);
+    waiter.resolve(result);
+  }
+}
+
 function getWorker(): Worker {
   if (worker) return worker;
   worker = new Worker(new URL("./pyodide-worker.ts", import.meta.url), {
@@ -68,27 +71,44 @@ function getWorker(): Worker {
   worker.addEventListener("message", onWorkerMessage);
   worker.addEventListener("error", (event) => {
     const message = event.message || "The Python runtime worker failed.";
-    for (const [id, waiter] of pending) {
-      pending.delete(id);
-      waiter.resolve({
-        stdout: "",
-        stderr: "",
-        figures: [],
-        error: message,
-        ready: false,
-      });
-    }
     worker = null;
+    settleAll({
+      stdout: "",
+      stderr: "",
+      figures: [],
+      error: message,
+      ready: false,
+    });
     setPhase("idle");
   });
   return worker;
 }
 
+/**
+ * Stop whatever Python is doing right now. There is no way to interrupt a busy
+ * Pyodide interpreter (an infinite loop never yields), so the only real remedy
+ * is to discard the worker; the next run loads a fresh one.
+ */
+export function stopRuntime(): void {
+  if (!worker) return;
+  worker.terminate();
+  worker = null;
+  settleAll({
+    stdout: "",
+    stderr: "",
+    figures: [],
+    error: null,
+    ready: false,
+    stopped: true,
+  });
+  setPhase("idle");
+}
+
 function request(msg: Omit<WorkerRequest, "id">): Promise<RunResult> {
   const id = nextId++;
   const body = { ...msg, id } as WorkerRequest;
-  return new Promise<RunResult>((resolve, reject) => {
-    pending.set(id, { resolve, reject });
+  return new Promise<RunResult>((resolve) => {
+    pending.set(id, { resolve });
     getWorker().postMessage(body);
   });
 }
@@ -102,23 +122,28 @@ function enqueue<T>(fn: () => Promise<T>): Promise<T> {
   return run;
 }
 
-export function ensureRuntime(): Promise<RunResult> {
-  return enqueue(async () => {
-    if (phase === "ready") {
-      return { stdout: "", stderr: "", figures: [], error: null, ready: true };
-    }
-    setPhase("loading");
-    const result = await request({ type: "init" });
-    setPhase(result.ready ? "ready" : "idle");
-    return result;
-  });
+function finish(result: RunResult): RunResult {
+  setPhase(result.ready ? "ready" : "idle");
+  return result;
 }
 
 export function runPython(code: string, theme?: PlotTheme): Promise<RunResult> {
   return enqueue(async () => {
     setPhase(phase === "ready" ? "running" : "loading");
-    const result = await request({ type: "run", code, theme });
-    setPhase(result.ready ? "ready" : "idle");
-    return result;
+    return finish(await request({ type: "run", code, theme }));
+  });
+}
+
+/**
+ * Discard everything the reader's code defined. A no-op when the runtime was
+ * never loaded, so pressing Reset first never triggers the download.
+ */
+export function resetPython(): Promise<RunResult> {
+  return enqueue(async () => {
+    if (!worker) {
+      return { stdout: "", stderr: "", figures: [], error: null, ready: false };
+    }
+    setPhase("running");
+    return finish(await request({ type: "reset" }));
   });
 }

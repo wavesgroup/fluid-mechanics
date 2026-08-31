@@ -7,7 +7,7 @@ export type PlotTheme = {
 };
 
 export type WorkerRequest =
-  | { type: "init"; id: number }
+  | { type: "reset"; id: number }
   | { type: "run"; id: number; code: string; theme?: PlotTheme };
 
 export type WorkerStatus = "loading" | "ready";
@@ -30,4 +30,6 @@ export type RunResult = {
   figures: string[];
   error: string | null;
   ready: boolean;
+  /** True when the run was cut short by Stop rather than finishing on its own. */
+  stopped?: boolean;
 };
