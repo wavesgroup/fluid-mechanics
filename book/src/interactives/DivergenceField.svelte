@@ -191,13 +191,19 @@
   <div class="field-stage">
     <div class="field-plot">
       <canvas bind:this={heatEl} class="field-heat" width={view.size} height={view.size}></canvas>
+      <!-- `application` is the closest ARIA role for a focusable 2-D probe: it
+           makes screen readers pass the arrow keys through to onKey instead of
+           using them to browse. No interactive role fits a surface like this, so
+           the two non-interactive-element rules are silenced deliberately. -->
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
       <svg
         bind:this={svgEl}
         class="vector-canvas field-overlay"
         viewBox="0 0 {view.size} {view.size}"
-        role="img"
+        role="application"
         tabindex="0"
-        aria-label="Vector field with divergence colormap. Hover or tap to show divergence and local flux."
+        aria-label="Vector field with divergence colormap. Hover, tap, or use the arrow keys to show divergence and local flux."
         onpointerdown={onPointerDown}
         onpointermove={onPointerMove}
         onpointerup={onPointerUp}

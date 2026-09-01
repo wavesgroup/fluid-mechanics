@@ -754,3 +754,18 @@ follows in the remainder of this course.
 6. Draw example vector fields that are: (a) non-divergent and irrotational,
       (b) divergent and irrotational, (c) non-divergent and rotational, and (d)
       divergent and rotational.
+
+<div class="interactive-slot" data-interactive="python-playground"><pre>
+import numpy as np
+import matplotlib.pyplot as plt
+#
+# Try the programming exercises above in this Python session.
+# NumPy and Matplotlib are already available.
+#
+# 1. Define a scalar, a vector, and a tensor, then print them.
+# 3. Compute a cross product by hand, then with a library function.
+# 4. Approximate a derivative with finite differences.
+# 5. Compute the gradient of a scalar field, and the divergence and curl
+#    of a vector field.
+# 6. Plot example vector fields with plt.quiver.
+</pre></div>
