@@ -662,6 +662,16 @@ cite {
   user-select: none;
 }
 
+.interactive .vector-canvas.orbit-canvas {
+  cursor: grab;
+}
+
+.interactive .orbit-hit {
+  fill: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
 .interactive .vector-canvas.is-dragging {
   cursor: grabbing;
 }
