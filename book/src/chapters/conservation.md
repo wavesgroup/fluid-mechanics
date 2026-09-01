@@ -94,6 +94,12 @@ $$
 
 This is the continuity equation in the Eulerian reference frame.
 
+Drag the mass-flux arrows on each face of the control volume below.
+The local density tendency is minus the sum of the three divergence
+contributions.
+
+<div class="interactive-slot" data-interactive="continuity-volume"></div>
+
 We're not constrained to a rectangular, fixed volume, however.
 We can derive this equation for an arbitrary control volume using the divergence
 theorem.

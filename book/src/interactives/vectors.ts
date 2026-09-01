@@ -110,13 +110,37 @@ export function svgToWorld(p: { x: number; y: number }, view: PlotView): Vec2 {
   };
 }
 
-export function eventToWorld(svg: SVGSVGElement, e: PointerEvent, view: PlotView): Vec2 {
+export function eventToSvg(
+  svg: SVGSVGElement,
+  e: PointerEvent,
+  view: PlotView,
+): { x: number; y: number } {
   const rect = svg.getBoundingClientRect();
-  const p = {
+  return {
     x: ((e.clientX - rect.left) / rect.width) * view.size,
     y: ((e.clientY - rect.top) / rect.height) * view.size,
   };
-  return clampVec(svgToWorld(p, view), view.min, view.max);
+}
+
+export function eventToWorld(svg: SVGSVGElement, e: PointerEvent, view: PlotView): Vec2 {
+  return clampVec(svgToWorld(eventToSvg(svg, e, view), view), view.min, view.max);
+}
+
+/**
+ * Parameter t along origin→axisEnd of the projection of `point` onto that
+ * segment's direction. If axisEnd is one unit of a 3-D axis in SVG, t is the
+ * displacement along that axis.
+ */
+export function projectOntoSvgAxis(
+  point: { x: number; y: number },
+  origin: { x: number; y: number },
+  axisEnd: { x: number; y: number },
+): number {
+  const ax = axisEnd.x - origin.x;
+  const ay = axisEnd.y - origin.y;
+  const denom = ax * ax + ay * ay;
+  if (denom < 1e-12) return 0;
+  return ((point.x - origin.x) * ax + (point.y - origin.y) * ay) / denom;
 }
 
 export function axisTicks(view: PlotView): number[] {
