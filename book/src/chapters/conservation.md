@@ -1038,7 +1038,7 @@ they're out of scope for this course.
   </div>
   <figcaption>
 
-Contours of density as a function of temperature and salinity for seawater. Contour labels are (density - 1000) kg m$^{-3}$. The slider sets the pressure, from sea-level ($p = 10^5\ Pa$, or 1000 mb) to $10^8\ Pa$ (about 10 km depth). After Fig. 1.3 in AOFD (Vallis, 2017).
+Contours of density as a function of temperature and salinity for seawater. Contour labels are (density - 1000) kg m$^{-3}$. In the interactive version, the slider sets the pressure from sea-level ($p = 10^5\ Pa$, or 1000 mb) to $10^8\ Pa$ (about 10 km depth); the static fallback shows sea level and about 4 km depth. After Fig. 1.3 in AOFD (Vallis, 2017).
 
   </figcaption>
 </figure>
