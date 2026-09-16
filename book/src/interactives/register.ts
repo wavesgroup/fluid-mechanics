@@ -16,6 +16,7 @@ const registry: Record<string, Loader> = {
   "divergence-field": () => load(import("./DivergenceField.svelte")),
   "curl-field": () => load(import("./CurlField.svelte")),
   "continuity-volume": () => load(import("./ContinuityVolume.svelte")),
+  "seawater-density": () => load(import("./SeawaterDensity.svelte")),
   "python-playground": () => load(import("./PythonPlayground.svelte")),
 };
 

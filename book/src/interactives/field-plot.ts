@@ -149,7 +149,9 @@ function lerpPt(
   return { x: x0 + u * (x1 - x0), y: y0 + u * (y1 - y0) };
 }
 
-const MS_PAIRS: [number, number][][] = [
+/** Crossed cell edges for each marching-squares corner code, by edge index:
+ *  0 = bottom, 1 = right, 2 = top, 3 = left. Shared with `contour.ts`. */
+export const MS_PAIRS: [number, number][][] = [
   [],
   [[0, 3]],
   [[0, 1]],

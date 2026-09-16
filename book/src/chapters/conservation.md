@@ -1027,16 +1027,18 @@ coefficient, the saline contraction coefficient, and the pressure
 coefficient, respectively.
 This form of the equation of state is a linear equation of state (as in, the
 dependence of density on temperature, salinity, and pressure each is linear).
-Dependence of density on temperature and salinity at two different pressure
-levels is shown in Fig. <a class="ref" data-key="fig:seawater_eqstate"></a>.
+Dependence of density on temperature and salinity, and how it shifts with
+pressure, is shown in Fig. <a class="ref" data-key="fig:seawater_eqstate"></a>.
 Higher order equations of state are often used for higher accuracy, however
 they're out of scope for this course.
 
 <figure class="book-figure" id="fig:seawater_eqstate">
-  <img src="/figures/fig_seawater_eqstate.svg" alt="Contours of density as a function of temperature and salinity for seawater. Contour labels are (density - 1000) kg m. Le" />
+  <div class="interactive-slot" data-interactive="seawater-density">
+    <img src="/figures/fig_seawater_eqstate.svg" alt="Contours of density as a function of temperature and salinity for seawater, at sea level and at 4 km depth." />
+  </div>
   <figcaption>
 
-Contours of density as a function of temperature and salinity for seawater. Contour labels are (density - 1000) kg m$^{-3}$. Left panel: at sea-level ($p = 10^5\ Pa$, or 1000 mb). Right panel: at $p = 4 \times 10^7\ Pa$ (about 4 km depth). In both cases the contours are slightly convex, so that if two parcels at the same density but different temperatures and salinities are mixed, the resulting parcel is of higher density. (The average temperature is not exactly conserved on mixing, but it very nearly is.) This is Fig. 1.3 in AOFD (Vallis, 2017).
+Contours of density as a function of temperature and salinity for seawater. Contour labels are (density - 1000) kg m$^{-3}$. The slider sets the pressure, from sea-level ($p = 10^5\ Pa$, or 1000 mb) to $10^8\ Pa$ (about 10 km depth). After Fig. 1.3 in AOFD (Vallis, 2017).
 
   </figcaption>
 </figure>
