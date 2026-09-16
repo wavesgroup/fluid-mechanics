@@ -54,7 +54,9 @@ export function levelsFor(grid: Grid, step: number, max = 64): number[] {
     if (v < lo) lo = v;
     if (v > hi) hi = v;
   }
-  if (!Number.isFinite(lo) || hi - lo < step) return [];
+  // A narrow range can still straddle a level -- 0.9 to 1.1 crosses 1 -- so
+  // leave it to `first` below to decide whether any level falls inside.
+  if (!Number.isFinite(lo) || !Number.isFinite(hi) || step <= 0) return [];
   const first = Math.ceil(lo / step) * step;
   const out: number[] = [];
   for (let v = first; v <= hi && out.length < max; v += step) {
