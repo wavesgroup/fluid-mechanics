@@ -980,6 +980,29 @@ cite {
     padding: 0;
   }
 
+  .book-figure .eos-canvas {
+    background: #fff;
+    border-color: #ccc;
+  }
+
+  .book-figure .eos-canvas text {
+    fill: #000;
+  }
+
+  .book-figure .eos-canvas line {
+    stroke: #aaa;
+  }
+
+  .book-figure .eos-canvas path,
+  .book-figure .eos-canvas rect,
+  .book-figure .eos-canvas circle {
+    stroke: #000;
+  }
+
+  .book-figure .eos-canvas circle {
+    fill: #fff;
+  }
+
   .book-figure .interactive-title,
   .book-figure .interactive-caption,
   .book-figure .interactive .controls,
