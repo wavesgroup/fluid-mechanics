@@ -808,6 +808,22 @@ cite {
   background: var(--plot-bg);
 }
 
+/* An interactive that stands in for a numbered figure sits inside the figure,
+   so the caption and the figure number still belong to it. */
+.book-figure > .interactive-slot,
+.book-figure > .interactive-slot > .interactive {
+  margin: 0;
+}
+
+.interactive .eos-canvas {
+  cursor: crosshair;
+}
+
+.interactive .eos-canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .theme-picker {
   position: relative;
 }
@@ -949,6 +965,48 @@ cite {
   .chapter-nav,
   .interactive,
   .interactive-slot {
+    display: none !important;
+  }
+
+  /* ...but one standing in for a figure carries the figure's content, so it
+     prints: the plot as it stands, minus the controls that need a pointer. On
+     the print page, where interactives are never hydrated, the slot still holds
+     the static figure. */
+  .book-figure > .interactive-slot,
+  .book-figure > .interactive-slot > .interactive {
+    display: block !important;
+    border: 0;
+    background: none;
+    padding: 0;
+  }
+
+  .book-figure .eos-canvas {
+    background: #fff;
+    border-color: #ccc;
+  }
+
+  .book-figure .eos-canvas text {
+    fill: #000;
+  }
+
+  .book-figure .eos-canvas line {
+    stroke: #aaa;
+  }
+
+  .book-figure .eos-canvas path,
+  .book-figure .eos-canvas rect,
+  .book-figure .eos-canvas circle {
+    stroke: #000;
+  }
+
+  .book-figure .eos-canvas circle {
+    fill: #fff;
+  }
+
+  .book-figure .interactive-title,
+  .book-figure .interactive-caption,
+  .book-figure .interactive .controls,
+  .book-figure .interactive .readout {
     display: none !important;
   }
 

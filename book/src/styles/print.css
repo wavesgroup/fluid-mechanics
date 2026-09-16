@@ -143,6 +143,13 @@
   display: none !important;
 }
 
+/* ...except a slot standing in for a numbered figure, which carries the
+   figure's content. Nothing is hydrated here, so it shows the static
+   fallback the slot was authored with. */
+.print-root .book-figure > .interactive-slot {
+  display: block !important;
+}
+
 @media print {
   html.print-root {
     --bg: #fff;
