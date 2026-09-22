@@ -34,10 +34,12 @@ on time scales that we are interested in.
 A small change in $\mathbf{C}$ can then be expressed as:
 
 <figure class="book-figure" id="fig:rotating_vector">
-  <img src="/figures/fig_rotating_vector.svg" alt="A vector rotating at an angular velocity . It appears to be a constant vector in the rotating frame, whereas in the iner" />
+  <div class="interactive-slot" data-interactive="rotating-vector">
+    <img src="/figures/fig_rotating_vector.svg" alt="Vector C rotating about Ω, with perpendicular component C⊥, inclination θ, azimuth λ, and tangent direction m along Ω × C." />
+  </div>
   <figcaption>
 
-A vector $\mathbf{C}$ rotating at an angular velocity $\mathbf{\Omega}$. It appears to be a constant vector in the rotating frame, whereas in the inertial frame it rotates according to $\left(d\mathbf{C}/dt\right)_I = \mathbf{\Omega} \times \mathbf{C}$. This is Fig. 2.1 in AOFD (Vallis, 2017).
+A vector $\mathbf{C}$ rotating at an angular velocity $\mathbf{\Omega}$. It appears to be a constant vector in the rotating frame, whereas in the inertial frame it rotates according to $\left(d\mathbf{C}/dt\right)_I = \mathbf{\Omega} \times \mathbf{C}$. Drag the vector tips or use the controls to explore its perpendicular component, the angles $\theta$ and $\lambda$, and its tangent rate of change. After Fig. 2.1 in AOFD (Vallis, 2017).
 
   </figcaption>
 </figure>
@@ -264,10 +266,12 @@ $$
 </div>
 
 <figure class="book-figure" id="fig:centrifugal_force">
-  <img src="/figures/fig_centrifugal_force.svg" alt="Left: directions of forces and coordinates in true spherical geometry. is the effective gravity (including the centrifug" />
+  <div class="interactive-slot" data-interactive="centrifugal-force">
+    <img src="/figures/fig_centrifugal_force.svg" alt="Spherical and effective-gravity coordinates, showing position r, rotation Ω, centrifugal acceleration C, effective gravity g, and a dashed geopotential surface." />
+  </div>
   <figcaption>
 
-Left: directions of forces and coordinates in true spherical geometry. $\mathbf{g}$ is the effective gravity (including the centrifugal force, $\mathbf{C}$) and its horizontal component is evidently non-zero. Right: a modified coordinate system, in which the vertical direction is defined by the direction of $\mathbf{g}$, and so the horizontal component of $\mathbf{g}$ is identically zero. The dashed line schematically indicates a surface of constant geopotential. The differences between the direction of $\mathbf{g}$ and the direction of the radial coordinate, and between the sphere and the geopotential surface, are much exaggerated and in reality are similar to the thickness of the lines themselves. This is Fig. 2.2 in AOFD (Vallis, 2017).
+(a) Directions of forces and coordinates in true spherical geometry. $\mathbf{g}$ is the effective gravity (including the centrifugal force, $\mathbf{C}$) and generally has a non-zero horizontal component. (b) A modified coordinate system, in which the upward vertical is opposite to $\mathbf{g}$, so its horizontal component is identically zero. The dashed surface has constant geopotential. In the interactive, drag $\mathbf{r}$ to change latitude or drag $\mathbf{\Omega}$ or $\mathbf{C}$ to change rotation strength; $\mathbf{g}_0$ denotes gravity without rotation. The differences between the radial and effective verticals, and between the sphere and the geopotential surface, are exaggerated and on Earth are similar to the thickness of the lines themselves. After Fig. 2.2 in AOFD (Vallis, 2017).
 
   </figcaption>
 </figure>
@@ -275,10 +279,12 @@ Left: directions of forces and coordinates in true spherical geometry. $\mathbf{
 ## Coriolis force components
 
 <figure class="book-figure" id="fig:rotation_components">
-  <img src="/figures/fig_rotation_components.svg" alt="(a) On the sphere the rotation vector can be decomposed into two components, one in the local vertical and one in the lo" />
+  <div class="interactive-slot" data-interactive="rotation-components">
+    <img src="/figures/fig_rotation_components.svg" alt="(a) Rotation vector Ω decomposed along local north j and local up k on a sphere. (b) On a rotating disk, Ω is parallel to local up k." />
+  </div>
   <figcaption>
 
-(a) On the sphere the rotation vector $\mathbf{\Omega}$ can be decomposed into two components, one in the local vertical and one in the local horizontal, pointing toward the pole. That is, $\mathbf{\Omega} = \Omega_y \mathbf{j} + \Omega_z \mathbf{k}$ where $\Omega_y = \Omega \cos\theta$ and $\Omega_z = \Omega \sin\theta$. In geophysical fluid dynamics, the rotation vector in the local vertical is often the more important component in the horizontal momentum equations. On a rotating disk, (b), the rotation vector $\mathbf{\Omega}$ is parallel to the local vertical $\mathbf{k}$. This is Fig. 2.4 in AOFD (Vallis, 2017).
+(a) On the sphere the rotation vector $\mathbf{\Omega}$ can be decomposed into two components, one in the local vertical and one along the local northward horizontal. That is, $\mathbf{\Omega} = \Omega_y \mathbf{j} + \Omega_z \mathbf{k}$ where $\Omega_y = \Omega \cos\theta$ and $\Omega_z = \Omega \sin\theta$. In geophysical fluid dynamics, the rotation vector in the local vertical is often the more important component in the horizontal momentum equations. On a rotating disk, (b), the rotation vector $\mathbf{\Omega}$ is parallel to the local vertical $\mathbf{k}$. Drag the position vector to vary latitude, including across the equator, or drag $\mathbf{\Omega}$ to vary the angular speed. After Fig. 2.4 in AOFD (Vallis, 2017).
 
   </figcaption>
 </figure>

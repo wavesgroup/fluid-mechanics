@@ -17,6 +17,9 @@ const registry: Record<string, Loader> = {
   "curl-field": () => load(import("./CurlField.svelte")),
   "continuity-volume": () => load(import("./ContinuityVolume.svelte")),
   "seawater-density": () => load(import("./SeawaterDensity.svelte")),
+  "rotating-vector": () => load(import("./RotatingVector.svelte")),
+  "centrifugal-force": () => load(import("./CentrifugalForce.svelte")),
+  "rotation-components": () => load(import("./RotationComponents.svelte")),
   "python-playground": () => load(import("./PythonPlayground.svelte")),
 };
 

@@ -815,6 +815,30 @@ cite {
   margin: 0;
 }
 
+.interactive .rotation-panels {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.interactive .rotation-panels svg text {
+  font-size: 18px;
+}
+
+.interactive .rotation-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.25rem;
+}
+
+.rotation-interactive .readout {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+@media (max-width: 42rem) {
+  .interactive .rotation-panels,
+  .interactive .rotation-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .interactive .eos-canvas {
   cursor: crosshair;
 }
@@ -1006,7 +1030,10 @@ cite {
   .book-figure .interactive-title,
   .book-figure .interactive-caption,
   .book-figure .interactive .controls,
-  .book-figure .interactive .readout {
+  .book-figure .interactive .readout,
+  .book-figure .rotation-interactive .vector-callout,
+  .book-figure .rotation-interactive .vec-hit,
+  .book-figure .rotation-interactive .vec-tip {
     display: none !important;
   }
 
