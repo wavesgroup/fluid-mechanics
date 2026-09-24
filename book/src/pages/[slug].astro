@@ -17,6 +17,18 @@ export async function getStaticPaths() {
 
 const { ch, prev, next } = Astro.props;
 const { Content, headings } = await render(ch);
+// Astro collects heading text after KaTeX has expanded inline math, so its
+// text contains both the visible glyph and the MathML/TeX accessibility text.
+// Use the Markdown source for TOC labels when a heading contains inline math.
+const sectionHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const sourceHeadings = [...ch.body.matchAll(/^(#{2,3})[ \t]+(.+?)\s*$/gm)];
+const tocHeadings = sectionHeadings.map((heading, index) => {
+  const source = sourceHeadings[index];
+  if (source && source[1].length === heading.depth && source[2].includes("$")) {
+    return { ...heading, text: source[2] };
+  }
+  return heading;
+});
 const kicker =
   ch.data.kind === "appendix"
     ? `Appendix ${ch.data.number}`
@@ -30,7 +42,7 @@ const kicker =
   number={ch.data.kind === "chapter" ? ch.data.number : null}
   kicker={kicker}
   secId={ch.data.label}
-  headings={headings}
+  headings={tocHeadings}
   prev={prev ? { href: chapterHref(prev), title: prev.data.title } : { href: "/", title: "Home" }}
   next={next ? { href: chapterHref(next), title: next.data.title } : { href: "/references", title: "References" }}
 >

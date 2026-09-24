@@ -1,4 +1,6 @@
 ---
+import katex from "katex";
+
 interface Heading {
   depth: number;
   slug: string;
@@ -11,6 +13,7 @@ interface Props {
 
 const { headings } = Astro.props;
 const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const mathParts = (text: string) => text.split(/(\$[^$\n]+\$)/g).filter(Boolean);
 ---
 
 {items.length > 0 && (
@@ -20,7 +23,13 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
       {items.map((h) => (
         <li>
           <a class={h.depth === 3 ? "toc-h3" : undefined} href={`#${h.slug}`}>
-            {h.text}
+            {mathParts(h.text).map((part) =>
+              part.startsWith("$") && part.endsWith("$") ? (
+                <Fragment set:html={katex.renderToString(part.slice(1, -1), { throwOnError: false, strict: "ignore" })} />
+              ) : (
+                part
+              ),
+            )}
           </a>
         </li>
       ))}
