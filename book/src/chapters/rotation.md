@@ -194,13 +194,19 @@ inserting Eq. <a class="eqref" data-key="eq:inertial_velocity_from_rotating"></a
 <div class="display-math" id="eq:rotating_acceleration">
 
 $$
-\left( \frac{d \mathbf{u}_R}{dt} \right)_R =
-\left( \frac{d \mathbf{u}_I}{dt} \right)_I -
-2 \mathbf{\Omega} \times \mathbf{u}_R -
-\mathbf{\Omega} \times \left( \mathbf{\Omega} \times \mathbf{r} \right)
+\left( \frac{d \mathbf{u}_I}{dt} \right)_I =
+\left( \frac{d \mathbf{u}_R}{dt} \right)_R +
+2 \mathbf{\Omega} \times \mathbf{u}_R +
+\mathbf{\Omega} \times \mathbf{\Omega} \times \mathbf{r}
 $$
 
 </div>
+
+Since we're interested in solving for the momentum in the rotating reference
+(*e.g.*, how windy will it be in my neighborhood tomorrow?), $\left( \frac{d \mathbf{u}_R}{dt} \right)_R$
+becomes our tendency of interest and the two new terms on the right-hand side
+of Eq. <a class="eqref" data-key="eq:rotating_acceleration"></a> will appear as the new forces
+of the momentum conservation balance (*e.g.*, Navier-Stokes).
 
 The interpretation of the terms in Eq. <a class="eqref" data-key="eq:rotating_acceleration"></a> is:
 
@@ -227,7 +233,7 @@ The interpretation of the terms in Eq. <a class="eqref" data-key="eq:rotating_ac
       of $\Omega$ relative to the plane of the flow (i.e. the deflection is to the
       right on the northern hemisphere and to the left on the southern hemisphere).
 
-- $-\mathbf{\Omega} \times \left( \mathbf{\Omega} \times \mathbf{r} \right)$,
+- $-\mathbf{\Omega} \times \mathbf{\Omega} \times \mathbf{r}$,
       is the <em>centrifugal acceleration</em>.
       It's always antiparallel to the position vector $\mathbf{r}$ by definition.
       Notice also that the centrifugal acceleration is not dependent on the velocity
