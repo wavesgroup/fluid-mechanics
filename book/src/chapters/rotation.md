@@ -573,7 +573,7 @@ In the southern hemisphere ($f < 0$), it is the opposite.
 A nearly geostrophic flow is illustrated in Fig. <a class="ref" data-key="fig:geostrophic_flow"></a>.
 
 <figure class="book-figure" id="fig:geostrophic_flow">
-  <div class="interactive-slot" data-interactive="geostrophic-flow">
+  <div class="interactive-slot" data-interactive="geostrophic-flow" data-expandable>
     <img src="/figures/fig_geostrophic_balance.svg" alt="Geostrophic flow along isobars around a low (L) and a high (H), with the pressure gradient force balanced by the Coriolis force." />
   </div>
   <figcaption>

@@ -541,201 +541,208 @@
 </script>
 
 <div class="interactive geostrophic-interactive" bind:this={rootEl}>
-  <p class="interactive-title">Geostrophic flow around highs and lows</p>
-  <p class="interactive-caption">
-    Drag a high (H) or a low (L) to move it, or drag the ring of the selected one to resize it.
-    Double-click or double-tap the map to add a high (shift-double-click for a low). Colour shows the geostrophic
-    speed |<strong>u</strong><sub>g</sub>|, particles drift with the flow, and the arrows at the
-    probe show the velocity and the two forces it balances.
-  </p>
-
-  <div class="field-plot geo-plot" bind:this={plotEl}>
-    <canvas bind:this={heatEl} class="field-heat" aria-hidden="true"></canvas>
-    <canvas bind:this={flowEl} class="field-heat" aria-hidden="true"></canvas>
-    <!-- `application` is the closest ARIA role for a 2-D probe surface: the
-         highs and lows inside it are the focusable controls. -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <svg
-      bind:this={svgEl}
-      class="vector-canvas"
-      class:is-dragging={drag !== null && drag.kind !== "probe"}
-      viewBox="0 0 {W} {H}"
-      role="application"
-      aria-label="Map of geostrophic flow. Colour is speed; lines are isobars. Tab to a high or low to move or resize it."
-      onpointerdown={onPointerDown}
-      onpointermove={onPointerMove}
-      onpointerup={onPointerUp}
-      onpointercancel={onPointerUp}
-    >
-      {#each isobars as c (c.key)}
-        <path
-          d={c.d}
-          fill="none"
-          stroke={fg}
-          stroke-width="1.1"
-          stroke-dasharray={c.high ? undefined : "5 3"}
-          opacity="0.4"
-        />
-      {/each}
-
-      <g class="geo-scale" transform="translate(18 {H - 20})">
-        <line x1="0" y1="0" x2={regime.scaleKm / regime.kmPerPx} y2="0" stroke={fg} stroke-width="2" />
-        <line x1="0" y1="-4" x2="0" y2="4" stroke={fg} stroke-width="2" />
-        <line x1={regime.scaleKm / regime.kmPerPx} y1="-4" x2={regime.scaleKm / regime.kmPerPx} y2="4" stroke={fg} stroke-width="2" />
-        <text x={regime.scaleKm / regime.kmPerPx / 2} y="-8" text-anchor="middle" fill={fg} stroke={bg} class="halo" font-size="14">
-          {regime.scaleKm} km
-        </text>
-      </g>
-
-      {#if selected}
-        <circle
-          cx={selected.x}
-          cy={selected.y}
-          r={selected.r}
-          fill="none"
-          stroke={accent}
-          stroke-width="1.5"
-          stroke-dasharray="6 4"
-        />
-      {/if}
-
-      <g class="geo-probe" pointer-events="none">
-        {#if pgfArrow}
-          <line x1={probe.x} y1={probe.y} x2={pgfArrow.x2} y2={pgfArrow.y2} stroke={colors.a} stroke-width="2.5" stroke-linecap="round" />
-          <polygon points={pgfArrow.head} fill={colors.a} />
-        {/if}
-        {#if cfArrow}
-          <line x1={probe.x} y1={probe.y} x2={cfArrow.x2} y2={cfArrow.y2} stroke={colors.b} stroke-width="2.5" stroke-linecap="round" />
-          <polygon points={cfArrow.head} fill={colors.b} />
-        {/if}
-        {#if uArrow}
-          <line x1={probe.x} y1={probe.y} x2={uArrow.x2} y2={uArrow.y2} stroke={fg} stroke-width="3" stroke-linecap="round" />
-          <polygon points={uArrow.head} fill={fg} />
-          <text x={uArrow.label.x} y={uArrow.label.y + 5} text-anchor="middle" fill={fg} stroke={bg} class="halo" font-size="16" font-style="italic" font-weight="600">
-            u<tspan baseline-shift="sub" font-size="0.7em">g</tspan>
-          </text>
-        {/if}
-        <circle cx={probe.x} cy={probe.y} r="4.5" fill={bg} stroke={fg} stroke-width="1.8" />
-      </g>
-
-      {#each features as feat (feat.id)}
-        {@const isSel = feat.id === selectedId}
-        <g class="geo-marker">
-          <circle cx={feat.x} cy={feat.y} r="15" fill={bg} fill-opacity="0.9" stroke={isSel ? accent : fg} stroke-width={isSel ? 2.5 : 1.5} />
-          <text x={feat.x} y={feat.y + 6} text-anchor="middle" fill={isSel ? accent : fg} font-size="17" font-weight="700">
-            {feat.a >= 0 ? "H" : "L"}
-          </text>
-          <circle
-            class="vec-hit"
-            cx={feat.x}
-            cy={feat.y}
-            r="22"
-            role="button"
-            tabindex="0"
-            aria-label={markerLabel(feat)}
-            aria-pressed={isSel}
-            onpointerdown={(e) => grab(e, "move", feat)}
-            onfocus={() => (selectedId = feat.id)}
-            onkeydown={(e) => onMarkerKey(e, feat)}
-          />
-        </g>
-        {#if isSel}
-          <circle class="geo-handle" cx={feat.x + feat.r} cy={feat.y} r="6" fill={bg} stroke={accent} stroke-width="2" />
-          <circle
-            class="vec-hit geo-radius-hit"
-            cx={feat.x + feat.r}
-            cy={feat.y}
-            r="16"
-            role="presentation"
-            onpointerdown={(e) => grab(e, "radius", feat)}
-          />
-        {/if}
-      {/each}
-    </svg>
+  <div class="geo-head">
+    <p class="interactive-title">Geostrophic flow around highs and lows</p>
+    <p class="interactive-caption">
+      Drag a high (H) or a low (L) to move it, or drag the ring of the selected one to resize it.
+      Double-click or double-tap the map to add a high (shift-double-click for a low). Colour shows the geostrophic
+      speed |<strong>u</strong><sub>g</sub>|, particles drift with the flow, and the arrows at the
+      probe show the velocity and the two forces it balances.
+    </p>
   </div>
 
-  <div class="geo-legend" aria-hidden="true">
-    <span class="geo-ramp">
-      <span>|u<sub>g</sub>|</span>
-      <span class="geo-ramp-bar">
-        <canvas bind:this={rampEl}></canvas>
-        <span class="geo-ticks">
-          <span>0</span>
-          <span>{fmt(regime.speedMax / 2, speedDigits)}</span>
-          <span>≥ {fmt(regime.speedMax, speedDigits)} m/s</span>
+  <div class="geo-main">
+    <div class="field-plot geo-plot" bind:this={plotEl}>
+      <canvas bind:this={heatEl} class="field-heat" aria-hidden="true"></canvas>
+      <canvas bind:this={flowEl} class="field-heat" aria-hidden="true"></canvas>
+      <!-- `application` is the closest ARIA role for a 2-D probe surface: the
+           highs and lows inside it are the focusable controls. -->
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+      <svg
+        bind:this={svgEl}
+        class="vector-canvas"
+        class:is-dragging={drag !== null && drag.kind !== "probe"}
+        viewBox="0 0 {W} {H}"
+        role="application"
+        aria-label="Map of geostrophic flow. Colour is speed; lines are isobars. Tab to a high or low to move or resize it."
+        onpointerdown={onPointerDown}
+        onpointermove={onPointerMove}
+        onpointerup={onPointerUp}
+        onpointercancel={onPointerUp}
+      >
+        {#each isobars as c (c.key)}
+          <path
+            d={c.d}
+            fill="none"
+            stroke={fg}
+            stroke-width="1.1"
+            stroke-dasharray={c.high ? undefined : "5 3"}
+            opacity="0.4"
+          />
+        {/each}
+
+        <g class="geo-scale" transform="translate(18 {H - 20})">
+          <line x1="0" y1="0" x2={regime.scaleKm / regime.kmPerPx} y2="0" stroke={fg} stroke-width="2" />
+          <line x1="0" y1="-4" x2="0" y2="4" stroke={fg} stroke-width="2" />
+          <line x1={regime.scaleKm / regime.kmPerPx} y1="-4" x2={regime.scaleKm / regime.kmPerPx} y2="4" stroke={fg} stroke-width="2" />
+          <text x={regime.scaleKm / regime.kmPerPx / 2} y="-8" text-anchor="middle" fill={fg} stroke={bg} class="halo" font-size="14">
+            {regime.scaleKm} km
+          </text>
+        </g>
+
+        {#if selected}
+          <circle
+            cx={selected.x}
+            cy={selected.y}
+            r={selected.r}
+            fill="none"
+            stroke={accent}
+            stroke-width="1.5"
+            stroke-dasharray="6 4"
+          />
+        {/if}
+
+        <g class="geo-probe" pointer-events="none">
+          {#if pgfArrow}
+            <line x1={probe.x} y1={probe.y} x2={pgfArrow.x2} y2={pgfArrow.y2} stroke={colors.a} stroke-width="2.5" stroke-linecap="round" />
+            <polygon points={pgfArrow.head} fill={colors.a} />
+          {/if}
+          {#if cfArrow}
+            <line x1={probe.x} y1={probe.y} x2={cfArrow.x2} y2={cfArrow.y2} stroke={colors.b} stroke-width="2.5" stroke-linecap="round" />
+            <polygon points={cfArrow.head} fill={colors.b} />
+          {/if}
+          {#if uArrow}
+            <line x1={probe.x} y1={probe.y} x2={uArrow.x2} y2={uArrow.y2} stroke={fg} stroke-width="3" stroke-linecap="round" />
+            <polygon points={uArrow.head} fill={fg} />
+            <text x={uArrow.label.x} y={uArrow.label.y + 5} text-anchor="middle" fill={fg} stroke={bg} class="halo" font-size="16" font-style="italic" font-weight="600">
+              u<tspan baseline-shift="sub" font-size="0.7em">g</tspan>
+            </text>
+          {/if}
+          <circle cx={probe.x} cy={probe.y} r="4.5" fill={bg} stroke={fg} stroke-width="1.8" />
+        </g>
+
+        {#each features as feat (feat.id)}
+          {@const isSel = feat.id === selectedId}
+          <g class="geo-marker">
+            <circle cx={feat.x} cy={feat.y} r="15" fill={bg} fill-opacity="0.9" stroke={isSel ? accent : fg} stroke-width={isSel ? 2.5 : 1.5} />
+            <text x={feat.x} y={feat.y + 6} text-anchor="middle" fill={isSel ? accent : fg} font-size="17" font-weight="700">
+              {feat.a >= 0 ? "H" : "L"}
+            </text>
+            <circle
+              class="vec-hit"
+              cx={feat.x}
+              cy={feat.y}
+              r="22"
+              role="button"
+              tabindex="0"
+              aria-label={markerLabel(feat)}
+              aria-pressed={isSel}
+              onpointerdown={(e) => grab(e, "move", feat)}
+              onfocus={() => (selectedId = feat.id)}
+              onkeydown={(e) => onMarkerKey(e, feat)}
+            />
+          </g>
+          {#if isSel}
+            <circle class="geo-handle" cx={feat.x + feat.r} cy={feat.y} r="6" fill={bg} stroke={accent} stroke-width="2" />
+            <circle
+              class="vec-hit geo-radius-hit"
+              cx={feat.x + feat.r}
+              cy={feat.y}
+              r="16"
+              role="presentation"
+              onpointerdown={(e) => grab(e, "radius", feat)}
+            />
+          {/if}
+        {/each}
+      </svg>
+    </div>
+
+    <div class="geo-legend" aria-hidden="true">
+      <span class="geo-ramp">
+        <span>|u<sub>g</sub>|</span>
+        <span class="geo-ramp-bar">
+          <canvas bind:this={rampEl}></canvas>
+          <span class="geo-ticks">
+            <span>0</span>
+            <span>{fmt(regime.speedMax / 2, speedDigits)}</span>
+            <span>≥ {fmt(regime.speedMax, speedDigits)} m/s</span>
+          </span>
         </span>
       </span>
-    </span>
-    <span class="geo-key"><i style:background={fg}></i><em>u</em><sub>g</sub> velocity</span>
-    <span class="geo-key"><i style:background={colors.a}></i>pressure gradient −∇<em>p</em>/<em>ρ</em></span>
-    <span class="geo-key"><i style:background={colors.b}></i>Coriolis −<em>f</em> <strong>k</strong>×<strong>u</strong><sub>g</sub></span>
-    <span class="geo-key"><i class="dashed" style:border-color={fg}></i>isobars (dashed: low)</span>
+      <span class="geo-key"><i style:background={fg}></i><em>u</em><sub>g</sub> velocity</span>
+      <span class="geo-key"><i style:background={colors.a}></i>pressure gradient −∇<em>p</em>/<em>ρ</em></span>
+      <span class="geo-key"><i style:background={colors.b}></i>Coriolis −<em>f</em> <strong>k</strong>×<strong>u</strong><sub>g</sub></span>
+      <span class="geo-key"><i class="dashed" style:border-color={fg}></i>isobars (dashed: low)</span>
+    </div>
   </div>
 
-  <p class="vector-callout" class:is-zero={!balanced || !features.length}>{callout}</p>
+  <div class="geo-side">
+    <p class="vector-callout" class:is-zero={!balanced || !features.length}>{callout}</p>
 
-  <div class="readout" aria-live="polite">
-    <span>η, p′ = ρgη</span>
-    <span>= {signed(etaM, regime.ampDigits + 1)} m, {signed(pPrime, 1)} hPa</span>
-    <span>(u<sub>g</sub>, v<sub>g</sub>)</span>
-    <span>
-      {#if balanced}= ({fmt(u, speedDigits)}, {fmt(v, speedDigits)}) m/s, |u<sub>g</sub>| = {fmt(speed, speedDigits)} m/s{:else}undefined (f ≈ 0){/if}
-    </span>
-    <span>|∇p|/ρ = g|∇η|</span>
-    <span>= {pgfText.m} × 10<sup>{pgfText.e}</sup> m s<sup>−2</sup>{#if balanced}&nbsp;= f |u<sub>g</sub>|{/if}</span>
+    <div class="readout" aria-live="polite">
+      <span>η, p′ = ρgη</span>
+      <span>= {signed(etaM, regime.ampDigits + 1)} m, {signed(pPrime, 1)} hPa</span>
+      <span>(u<sub>g</sub>, v<sub>g</sub>)</span>
+      <span>
+        {#if balanced}= ({fmt(u, speedDigits)}, {fmt(v, speedDigits)}) m/s, |u<sub>g</sub>| = {fmt(speed, speedDigits)} m/s{:else}undefined (f ≈ 0){/if}
+      </span>
+      <span>|∇p|/ρ = g|∇η|</span>
+      <span>= {pgfText.m} × 10<sup>{pgfText.e}</sup> m s<sup>−2</sup>{#if balanced}&nbsp;= f |u<sub>g</sub>|{/if}</span>
+    </div>
+
+    <div class="controls rotation-controls">
+      <label>
+        <span>Coriolis f</span>
+        <span>{#if Math.abs(f) < 1e-9}0{:else}{fText.m} × 10<sup>{fText.e}</sup>{/if} s<sup>−1</sup> ({latText})</span>
+        <input type="range" min="-1.45" max="1.45" step="0.01" bind:value={fScaled} />
+      </label>
+      <label>
+        <span>Gravity g</span>
+        <span>{fmt(g, 2)} m s<sup>−2</sup></span>
+        <input type="range" min="1" max="25" step="0.01" bind:value={g} />
+      </label>
+      <label>
+        <span>Amplitude η₀ {selected ? (selected.a >= 0 ? "(high)" : "(low)") : ""}</span>
+        <span>{selected ? `${signed(selected.a * regime.ampScale, regime.ampDigits)} m` : "select H or L"}</span>
+        <input
+          type="range"
+          min={-A_MAX}
+          max={A_MAX}
+          step="0.01"
+          disabled={!selected}
+          value={selected?.a ?? 0}
+          oninput={(e) => selected && setAmplitude(selected, Number(e.currentTarget.value))}
+        />
+      </label>
+      <label>
+        <span>Radius</span>
+        <span>{selected ? `${Math.round(selected.r * regime.kmPerPx)} km` : "select H or L"}</span>
+        <input
+          type="range"
+          min={R_MIN}
+          max={R_MAX}
+          step="1"
+          disabled={!selected}
+          value={selected?.r ?? R_MIN}
+          oninput={(e) => selected && setRadius(selected, Number(e.currentTarget.value))}
+        />
+      </label>
+    </div>
+
+    <div class="controls vector-actions" role="group" aria-label="Highs, lows, and setting">
+      <button type="button" disabled={features.length >= MAX_FEATURES} onclick={() => addFeature(1)}>Add high</button>
+      <button type="button" disabled={features.length >= MAX_FEATURES} onclick={() => addFeature(-1)}>Add low</button>
+      <button type="button" disabled={!selected} onclick={removeSelected}>Remove</button>
+      <span class="geo-sep" aria-hidden="true"></span>
+      {#each Object.values(REGIMES) as r (r.id)}
+        <button type="button" aria-pressed={regimeId === r.id} onclick={() => (regimeId = r.id)}>{r.label}</button>
+      {/each}
+      <span class="geo-sep" aria-hidden="true"></span>
+      <button type="button" aria-pressed={!playing} onclick={() => (playing = !playing)}>{playing ? "Pause" : "Play"}</button>
+      <button type="button" onclick={reset}>Reset</button>
+    </div>
   </div>
 
-  <div class="controls rotation-controls">
-    <label>
-      <span>Coriolis f</span>
-      <span>{#if Math.abs(f) < 1e-9}0{:else}{fText.m} × 10<sup>{fText.e}</sup>{/if} s<sup>−1</sup> ({latText})</span>
-      <input type="range" min="-1.45" max="1.45" step="0.01" bind:value={fScaled} />
-    </label>
-    <label>
-      <span>Gravity g</span>
-      <span>{fmt(g, 2)} m s<sup>−2</sup></span>
-      <input type="range" min="1" max="25" step="0.01" bind:value={g} />
-    </label>
-    <label>
-      <span>Amplitude η₀ {selected ? (selected.a >= 0 ? "(high)" : "(low)") : ""}</span>
-      <span>{selected ? `${signed(selected.a * regime.ampScale, regime.ampDigits)} m` : "select H or L"}</span>
-      <input
-        type="range"
-        min={-A_MAX}
-        max={A_MAX}
-        step="0.01"
-        disabled={!selected}
-        value={selected?.a ?? 0}
-        oninput={(e) => selected && setAmplitude(selected, Number(e.currentTarget.value))}
-      />
-    </label>
-    <label>
-      <span>Radius</span>
-      <span>{selected ? `${Math.round(selected.r * regime.kmPerPx)} km` : "select H or L"}</span>
-      <input
-        type="range"
-        min={R_MIN}
-        max={R_MAX}
-        step="1"
-        disabled={!selected}
-        value={selected?.r ?? R_MIN}
-        oninput={(e) => selected && setRadius(selected, Number(e.currentTarget.value))}
-      />
-    </label>
-  </div>
-
-  <div class="controls vector-actions" role="group" aria-label="Highs, lows, and setting">
-    <button type="button" disabled={features.length >= MAX_FEATURES} onclick={() => addFeature(1)}>Add high</button>
-    <button type="button" disabled={features.length >= MAX_FEATURES} onclick={() => addFeature(-1)}>Add low</button>
-    <button type="button" disabled={!selected} onclick={removeSelected}>Remove</button>
-    <span class="geo-sep" aria-hidden="true"></span>
-    {#each Object.values(REGIMES) as r (r.id)}
-      <button type="button" aria-pressed={regimeId === r.id} onclick={() => (regimeId = r.id)}>{r.label}</button>
-    {/each}
-    <span class="geo-sep" aria-hidden="true"></span>
-    <button type="button" aria-pressed={!playing} onclick={() => (playing = !playing)}>{playing ? "Pause" : "Play"}</button>
-    <button type="button" onclick={reset}>Reset</button>
-  </div>
   <p class="geo-note">
     {regime.label}: H and L are anomalies η of the {regime.surface}, so p′ = ρgη with ρ = {regime.rho} kg m<sup>−3</sup>.
     One second of animation is about {regime.timeLabel}.

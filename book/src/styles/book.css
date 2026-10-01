@@ -839,6 +839,124 @@ cite {
   }
 }
 
+/* Expandable interactives (see interactives/expand.ts): a button in the
+   slot's corner opens the figure in a dialog covering most of the window. */
+.interactive-slot[data-expandable] {
+  position: relative;
+}
+
+.interactive-slot[data-expandable] .interactive-title {
+  padding-right: 6.5rem;
+}
+
+.interactive-expand,
+.interactive-collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-family: var(--font-ui);
+  color: var(--muted);
+  background: var(--nav-bg);
+  border: 1px solid var(--rule);
+  cursor: pointer;
+}
+
+.interactive-expand:hover,
+.interactive-collapse:hover {
+  color: var(--fg);
+  border-color: var(--accent);
+}
+
+.interactive-expand:focus-visible,
+.interactive-collapse:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.interactive-expand {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  z-index: 2;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.interactive-expand svg,
+.interactive-collapse svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.interactive-dialog {
+  box-sizing: border-box;
+  width: 90vw;
+  height: 90vh;
+  height: 90dvh;
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  color: var(--fg);
+  background: var(--nav-bg);
+  border: 1px solid var(--rule);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.35);
+}
+
+/* ::backdrop does not inherit custom properties everywhere, so no tokens. */
+.interactive-dialog::backdrop {
+  background: rgb(0 0 0 / 0.55);
+}
+
+.interactive-dialog-body {
+  box-sizing: border-box;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.interactive-dialog-body > .interactive {
+  box-sizing: border-box;
+  min-height: 100%;
+  margin: 0;
+  border: 0;
+  padding: 1.25rem 1.5rem;
+}
+
+.interactive-dialog .interactive-title {
+  padding-right: 3rem;
+}
+
+.interactive-collapse {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  z-index: 3;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+html.has-interactive-dialog {
+  overflow: hidden;
+}
+
+@media (max-width: 42rem) {
+  .interactive-dialog {
+    width: 96vw;
+    height: 94vh;
+    height: 94dvh;
+  }
+
+  .interactive-dialog-body > .interactive {
+    padding: 1rem;
+  }
+}
+
 .geostrophic-interactive .geo-plot svg {
   cursor: crosshair;
 }
@@ -928,6 +1046,51 @@ cite {
   font-family: var(--font-ui);
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+/* Expanded, the map takes the left of the dialog, as large as the height
+   allows, with the readouts and controls in a column beside it. */
+@media (min-width: 56rem) {
+  .interactive-dialog .geostrophic-interactive {
+    display: grid;
+    /* The map grows to its height-limited width first; the side column gets
+       what is left, but never less than 20rem. */
+    grid-template-columns: minmax(0, calc((90vh - 7rem) * 1.6)) minmax(20rem, 1fr);
+    grid-template-columns: minmax(0, calc((90dvh - 7rem) * 1.6)) minmax(20rem, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "main head"
+      "main side"
+      "note side";
+    column-gap: 1.5rem;
+    align-content: start;
+    align-content: safe center;
+  }
+
+  .interactive-dialog .geostrophic-interactive .geo-head,
+  .interactive-dialog .geostrophic-interactive .geo-side {
+    max-width: 28rem;
+  }
+
+  .interactive-dialog .geostrophic-interactive .geo-head {
+    grid-area: head;
+  }
+
+  .interactive-dialog .geostrophic-interactive .geo-main {
+    grid-area: main;
+  }
+
+  .interactive-dialog .geostrophic-interactive .geo-side {
+    grid-area: side;
+  }
+
+  .interactive-dialog .geostrophic-interactive .geo-note {
+    grid-area: note;
+  }
+
+  .interactive-dialog .geostrophic-interactive .rotation-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .interactive .eos-canvas {
@@ -1078,6 +1241,7 @@ cite {
   .toc-toggle,
   .theme-picker,
   .chapter-nav,
+  .interactive-expand,
   .interactive,
   .interactive-slot {
     display: none !important;
