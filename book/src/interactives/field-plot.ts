@@ -13,7 +13,7 @@ export const DEFAULT_PROBE: Vec2 = { x: 0.7, y: 0.55 };
 
 export type RGB = [number, number, number];
 
-function parseRgb(c: string): RGB | null {
+export function parseRgb(c: string): RGB | null {
   const hex = c.trim().match(/^#([0-9a-f]{6})$/i);
   if (hex) {
     const n = parseInt(hex[1], 16);
@@ -47,7 +47,7 @@ export function rgbCss(c: RGB): string {
   return `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`;
 }
 
-function darkTheme(theme: Theme): boolean {
+export function darkTheme(theme: Theme): boolean {
   return luminance(theme.bg) < 0.4;
 }
 
