@@ -57,24 +57,25 @@ export function makeExpandable(slot: HTMLElement): () => void {
     moved = [...slot.childNodes].filter((n) => n !== open);
     open.remove();
 
-    dialog = document.createElement("dialog");
-    dialog.className = "interactive-dialog";
-    dialog.setAttribute("aria-label", name);
+    const d = document.createElement("dialog");
+    d.className = "interactive-dialog";
+    d.setAttribute("aria-label", name);
     const close = iconButton("interactive-collapse", CLOSE_ICON, "Close expanded view");
-    close.addEventListener("click", () => dialog?.close());
+    close.addEventListener("click", () => d.close());
     const body = document.createElement("div");
     body.className = "interactive-dialog-body";
     body.append(...moved);
-    dialog.append(close, body);
+    d.append(close, body);
     // A click on the backdrop lands on the dialog itself, not on its content.
-    dialog.addEventListener("click", (e) => {
-      if (e.target === dialog) dialog.close();
+    d.addEventListener("click", (e) => {
+      if (e.target === d) d.close();
     });
-    dialog.addEventListener("close", restore);
+    d.addEventListener("close", restore);
 
-    document.body.append(dialog);
+    dialog = d;
+    document.body.append(d);
     document.documentElement.classList.add("has-interactive-dialog");
-    dialog.showModal();
+    d.showModal();
   }
 
   open.addEventListener("click", expand);
