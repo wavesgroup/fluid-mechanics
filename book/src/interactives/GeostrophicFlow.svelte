@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { onThemeChange, readTheme, type Theme } from "./plot";
   import { contours } from "./contour";
   import { darkTheme } from "./field-plot";
@@ -469,14 +469,38 @@
     ctx.globalAlpha = 1;
   }
 
-  /** A still frame of trails for the current flow, for when motion is paused. */
-  function snapshot() {
-    seedParticles();
+  /**
+   * Redraw the trails of particles frozen where they are by tracing each one
+   * back along the current flow. While paused, an edit to the flow updates
+   * the still frame without moving any particle, so Play resumes from it.
+   */
+  function retrace() {
+    const grid = flow;
+    const step = regime.timeScale / (regime.kmPerPx * 1000) / 60;
     for (let i = 0; i < PARTICLES; i++) {
-      life[i] = Math.max(life[i], TRAIL);
-      maxLife[i] = Math.max(maxLife[i], life[i] + TRAIL + 12);
+      let x = px[i * TRAIL + head];
+      let y = py[i * TRAIL + head];
+      const [u0, v0] = sampleFlow(grid, x, y);
+      vis[i] = Math.min(1, Math.hypot(u0, v0) / (0.15 * regime.speedMax));
+      let n = 1;
+      for (; n < TRAIL; n++) {
+        const [ue, vn] = sampleFlow(grid, x, y);
+        let dx = -ue * step;
+        let dy = vn * step;
+        const d = Math.hypot(dx, dy);
+        if (d > MAX_STEP) {
+          dx *= MAX_STEP / d;
+          dy *= MAX_STEP / d;
+        }
+        x += dx;
+        y += dy;
+        if (x < 0 || x > W || y < 0 || y > H) break;
+        const k = (head - n + TRAIL) % TRAIL;
+        px[i * TRAIL + k] = x;
+        py[i * TRAIL + k] = y;
+      }
+      len[i] = n;
     }
-    for (let t = 0; t < TRAIL; t++) advance(1 / 60);
     draw();
   }
 
@@ -501,11 +525,12 @@
   });
 
   // While paused, keep the still trails in step with the flow being edited;
-  // with no balance, this clears them.
+  // with no balance, this clears them. Pausing itself must not retrace, or
+  // the frame would jump, so `playing` is read untracked.
   $effect(() => {
     flow;
     theme;
-    if (!playing || !balanced) snapshot();
+    if (!untrack(() => playing) || !balanced) retrace();
   });
 
   onMount(() => {
