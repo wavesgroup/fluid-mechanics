@@ -121,7 +121,7 @@
     };
   }
 
-  // Both forces share one scale -- a speed at the top of the colour scale at
+  // Both forces share one scale -- a speed at the top of the color scale at
   // f = 10⁻⁴ s⁻¹ draws as ARROW_PX -- so their balance reads directly. Capping
   // them at the same length keeps them equal when f is large.
   const forceScale = $derived(ARROW_PX / (1e-4 * regime.speedMax));
@@ -141,8 +141,8 @@
     if (!balanced)
       return "f ≈ 0, as at the equator: no Coriolis force balances the pressure gradient, so there is no geostrophic flow.";
     if (f > 0)
-      return "f > 0 (Northern Hemisphere): flow follows the isobars, anticlockwise (cyclonic) around lows and clockwise (anticyclonic) around highs.";
-    return "f < 0 (Southern Hemisphere): flow follows the isobars, clockwise (cyclonic) around lows and anticlockwise (anticyclonic) around highs.";
+      return "f > 0 (Northern Hemisphere): flow follows the isobars, counterclockwise (cyclonic) around lows and clockwise (anticyclonic) around highs.";
+    return "f < 0 (Southern Hemisphere): flow follows the isobars, clockwise (cyclonic) around lows and counterclockwise (anticyclonic) around highs.";
   });
 
   function sci(x: number): { m: string; e: number } {
@@ -310,7 +310,7 @@
     return `${kind}: amplitude ${signed(feat.a * regime.ampScale, regime.ampDigits)} m, radius ${km(feat.r)} km, at ${km(feat.x)} km east, ${km(H - feat.y)} km north. Arrow keys move it, plus and minus change the amplitude, brackets change the radius, Delete removes it.`;
   }
 
-  // ---- Speed colour map ----------------------------------------------------
+  // ---- Speed color map ----------------------------------------------------
 
   let offscreen: HTMLCanvasElement | null = null;
 
@@ -337,7 +337,7 @@
     octx.putImageData(img, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingEnabled = true;
-    // Grid node i sits at x = i·CELL, so centre each image pixel on its node.
+    // Grid node i sits at x = i·CELL, so center each image pixel on its node.
     ctx.drawImage(offscreen, -CELL / 2, -CELL / 2, NX * CELL, NY * CELL);
   }
 
@@ -374,7 +374,7 @@
   const len = new Uint8Array(PARTICLES);
   const life = new Uint16Array(PARTICLES);
   const maxLife = new Uint16Array(PARTICLES);
-  /** Local speed as a fraction of the colour scale, to fade still water. */
+  /** Local speed as a fraction of the color scale, to fade still water. */
   const vis = new Float32Array(PARTICLES);
   let head = 0;
   let cssWidth = W;
@@ -545,7 +545,7 @@
     <p class="interactive-title">Geostrophic flow around highs and lows</p>
     <p class="interactive-caption">
       Drag a high (H) or a low (L) to move it, or drag the ring of the selected one to resize it.
-      Double-click or double-tap the map to add a high (shift-double-click for a low). Colour shows the geostrophic
+      Double-click or double-tap the map to add a high (shift-double-click for a low). Color shows the geostrophic
       speed |<strong>u</strong><sub>g</sub>|, particles drift with the flow, and the arrows at the
       probe show the velocity and the two forces it balances.
     </p>
@@ -564,7 +564,7 @@
         class:is-dragging={drag !== null && drag.kind !== "probe"}
         viewBox="0 0 {W} {H}"
         role="application"
-        aria-label="Map of geostrophic flow. Colour is speed; lines are isobars. Tab to a high or low to move or resize it."
+        aria-label="Map of geostrophic flow. Color is speed; lines are isobars. Tab to a high or low to move or resize it."
         onpointerdown={onPointerDown}
         onpointermove={onPointerMove}
         onpointerup={onPointerUp}

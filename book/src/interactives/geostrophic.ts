@@ -5,7 +5,7 @@
  * ∇p = ρ g ∇η, so the geostrophic velocity is u_g = (g / f) k × ∇η.
  *
  * Everything lives in plot pixels (x right, y down, as in the SVG); a regime
- * only sets how many km a pixel is and how many metres a unit amplitude is,
+ * only sets how many km a pixel is and how many meters a unit amplitude is,
  * so switching regimes rescales the numbers but leaves the picture alone.
  */
 
@@ -28,7 +28,7 @@ export const F_MIN = 0.05e-4;
 
 export type Feature = {
   id: number;
-  /** Centre in plot pixels. */
+  /** Center in plot pixels. */
   x: number;
   y: number;
   /** e-folding radius in plot pixels. */
@@ -42,16 +42,16 @@ export type Regime = {
   label: string;
   surface: string;
   kmPerPx: number;
-  /** Metres of η per unit amplitude. */
+  /** Meters of η per unit amplitude. */
   ampScale: number;
   ampDigits: number;
   rho: number;
-  /** Speed at the top of the colour scale, m/s. */
+  /** Speed at the top of the color scale, m/s. */
   speedMax: number;
   /** Model seconds per second of animation. */
   timeScale: number;
   timeLabel: string;
-  /** Kilometres shown by the scale bar. */
+  /** Kilometers shown by the scale bar. */
   scaleKm: number;
 };
 
@@ -115,7 +115,7 @@ export function heightAt(features: Feature[], x: number, y: number) {
 }
 
 /**
- * Metres per second of geostrophic speed per unit amplitude gradient (per
+ * Meters per second of geostrophic speed per unit amplitude gradient (per
  * pixel). Velocity is east = k · ey, north = k · ex: y points down on screen,
  * so ∂η/∂(north) = −ey and u_g = −(g/f) ∂η/∂(north) = (g/f) ey.
  */
@@ -201,9 +201,9 @@ function mix(a: RGB, b: RGB, t: number): RGB {
 }
 
 /**
- * Speed colour ramp, starting from the plot background so still water fades
+ * Speed color ramp, starting from the plot background so still water fades
  * into the page. The top end stays mid-tone in every theme so the particles,
- * drawn in the text colour, keep their contrast against the fastest flow.
+ * drawn in the text color, keep their contrast against the fastest flow.
  */
 export function speedRamp(theme: Theme): Uint8ClampedArray {
   const bg = parseRgb(theme.bg) ?? [247, 243, 235];
