@@ -12,7 +12,35 @@
  * viewBoxes, a ResizeObserver on a canvas) grows with the dialog. A component
  * that wants a different layout when expanded can style itself under
  * `.interactive-dialog`.
+ *
+ * Opening and closing fade over FADE_MS: the dialog and its backdrop on the
+ * way in and out, and the figure as it lands back in the page.
  */
+
+const FADE_MS = 100;
+
+/** Fade `el` (and its ::backdrop, for a dialog) between two opacities. */
+function fade(el: HTMLElement, from: number, to: number, backdrop = false): Promise<void> {
+  if (typeof el.animate !== "function") return Promise.resolve();
+  const keyframes = { opacity: [from, to] };
+  const timing: KeyframeAnimationOptions = { duration: FADE_MS, easing: "ease-out", fill: "forwards" };
+  const runs = [el.animate(keyframes, timing)];
+  if (backdrop) {
+    try {
+      runs.push(el.animate(keyframes, { ...timing, pseudoElement: "::backdrop" }));
+    } catch {
+      // No pseudo-element animation here; the backdrop just appears.
+    }
+  }
+  return Promise.all(runs.map((a) => a.finished)).then(
+    () => {
+      // A fade to full opacity hands back to the stylesheet; a fade out holds
+      // until the element is closed and removed.
+      if (to === 1) for (const a of runs) a.cancel();
+    },
+    () => {},
+  );
+}
 
 const EXPAND_ICON =
   '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
@@ -37,6 +65,7 @@ export function makeExpandable(slot: HTMLElement): () => void {
   slot.append(open);
 
   let dialog: HTMLDialogElement | null = null;
+  let closing = false;
   let moved: Node[] = [];
 
   function restore() {
@@ -47,7 +76,17 @@ export function makeExpandable(slot: HTMLElement): () => void {
     document.documentElement.classList.remove("has-interactive-dialog");
     dialog.remove();
     dialog = null;
+    closing = false;
     open.focus({ preventScroll: true });
+    void fade(slot, 0, 1);
+  }
+
+  /** Fade the dialog out, then close it; `close` puts the figure back. */
+  function dismiss() {
+    const d = dialog;
+    if (!d || closing) return;
+    closing = true;
+    void fade(d, 1, 0, true).then(() => d.close());
   }
 
   function expand() {
@@ -61,14 +100,20 @@ export function makeExpandable(slot: HTMLElement): () => void {
     d.className = "interactive-dialog";
     d.setAttribute("aria-label", name);
     const close = iconButton("interactive-collapse", CLOSE_ICON, "Close expanded view");
-    close.addEventListener("click", () => d.close());
+    close.addEventListener("click", dismiss);
     const body = document.createElement("div");
     body.className = "interactive-dialog-body";
     body.append(...moved);
     d.append(close, body);
     // A click on the backdrop lands on the dialog itself, not on its content.
     d.addEventListener("click", (e) => {
-      if (e.target === d) d.close();
+      if (e.target === d) dismiss();
+    });
+    // Esc closes a modal dialog at once; hold it for the fade. If the browser
+    // insists (a repeated Esc can't be cancelled), `close` still restores.
+    d.addEventListener("cancel", (e) => {
+      e.preventDefault();
+      dismiss();
     });
     d.addEventListener("close", restore);
 
@@ -76,6 +121,7 @@ export function makeExpandable(slot: HTMLElement): () => void {
     document.body.append(d);
     document.documentElement.classList.add("has-interactive-dialog");
     d.showModal();
+    void fade(d, 0, 1, true);
   }
 
   open.addEventListener("click", expand);
