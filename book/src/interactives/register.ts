@@ -1,4 +1,5 @@
 import { mount, unmount, type Component } from "svelte";
+import { makeExpandable } from "./expand";
 
 type Loader = () => Promise<Component>;
 
@@ -20,6 +21,7 @@ const registry: Record<string, Loader> = {
   "rotating-vector": () => load(import("./RotatingVector.svelte")),
   "centrifugal-force": () => load(import("./CentrifugalForce.svelte")),
   "rotation-components": () => load(import("./RotationComponents.svelte")),
+  "geostrophic-flow": () => load(import("./GeostrophicFlow.svelte")),
   "python-playground": () => load(import("./PythonPlayground.svelte")),
 };
 
@@ -56,6 +58,7 @@ function propsFor(name: string, node: HTMLElement): Record<string, string> {
 
 export function hydrateInteractives(root: ParentNode = document) {
   const instances: ReturnType<typeof mount>[] = [];
+  const cleanups: (() => void)[] = [];
   let disposed = false;
 
   for (const node of root.querySelectorAll<HTMLElement>("[data-interactive]")) {
@@ -73,6 +76,7 @@ export function hydrateInteractives(root: ParentNode = document) {
         node.replaceChildren();
         node.dataset.hydrated = "true";
         instances.push(mount(Comp, { target: node, props }));
+        if (node.hasAttribute("data-expandable")) cleanups.push(makeExpandable(node));
       },
       () => {
         // Leave the fallback in place if the chunk fails to load.
@@ -83,6 +87,8 @@ export function hydrateInteractives(root: ParentNode = document) {
 
   return () => {
     disposed = true;
+    for (const cleanup of cleanups) cleanup();
+    cleanups.length = 0;
     for (const inst of instances) unmount(inst);
     instances.length = 0;
   };

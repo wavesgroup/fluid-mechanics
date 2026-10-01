@@ -573,10 +573,12 @@ In the southern hemisphere ($f < 0$), it is the opposite.
 A nearly geostrophic flow is illustrated in Fig. <a class="ref" data-key="fig:geostrophic_flow"></a>.
 
 <figure class="book-figure" id="fig:geostrophic_flow">
-  <img src="/figures/fig_geostrophic_balance.svg" alt="Geostrophic flow with a positive value of the Coriolis parameter . Flow is parallel to the lines of constant pressure (i" />
+  <div class="interactive-slot" data-interactive="geostrophic-flow" data-expandable>
+    <img src="/figures/fig_geostrophic_balance.svg" alt="Geostrophic flow along isobars around a low (L) and a high (H), with the pressure gradient force balanced by the Coriolis force." />
+  </div>
   <figcaption>
 
-Geostrophic flow with a positive value of the Coriolis parameter $f$. Flow is parallel to the lines of constant pressure (isobars). Cyclonic flow is anticlockwise around a low pressure region and anticyclonic flow is clockwise around a high. If $f$ were negative, as in the Southern Hemisphere, (anti)cyclonic flow would be (anti)clockwise. This is Fig. 2.5 in AOFD (Vallis, 2017).
+Geostrophic flow with a positive value of the Coriolis parameter $f$. Flow is parallel to the lines of constant pressure (isobars). Cyclonic flow is counterclockwise around a low pressure region and anticyclonic flow is clockwise around a high. If $f$ were negative, as in the Southern Hemisphere, cyclonic flow would be clockwise and anticyclonic flow counterclockwise. In the interactive, the highs and lows are anomalies $\eta$ in the height of the sea surface (ocean) or of a constant-pressure surface (atmosphere). Hydrostatic balance makes the horizontal pressure gradient $\nabla p = \rho g \nabla \eta$, so the geostrophic velocity is $\mathbf{u}_g = (g/f)\, \mathbf{k} \times \nabla \eta$. Drag, add, or remove highs and lows, set their amplitude and radius, and vary $f$ (including its sign) and $g$. Color shows the geostrophic speed and particles drift with the flow. At the probe, the pressure gradient and Coriolis forces are equal and opposite, and the velocity is perpendicular to both. After Fig. 2.5 in AOFD (Vallis, 2017).
 
   </figcaption>
 </figure>
