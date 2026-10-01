@@ -13,8 +13,9 @@
  * that wants a different layout when expanded can style itself under
  * `.interactive-dialog`.
  *
- * Opening and closing fade over FADE_MS: the dialog and its backdrop on the
- * way in and out, and the figure as it lands back in the page.
+ * The dialog and its backdrop fade in and out over FADE_MS. Throughout, the
+ * figure is never missing from either place: a frozen snapshot stands in for
+ * it in the page while it is expanded, and in the dialog as that fades out.
  */
 
 const FADE_MS = 100;
@@ -35,7 +36,7 @@ function fade(el: HTMLElement, from: number, to: number, backdrop = false): Prom
   return Promise.all(runs.map((a) => a.finished)).then(
     () => {
       // A fade to full opacity hands back to the stylesheet; a fade out holds
-      // until the element is closed and removed.
+      // until the dialog is closed and removed.
       if (to === 1) for (const a of runs) a.cancel();
     },
     () => {},
@@ -58,6 +59,44 @@ function iconButton(className: string, icon: string, label: string, text?: strin
   return button;
 }
 
+/**
+ * A frozen, inert copy of `nodes`, to stand in for a figure where it is not:
+ * canvases keep their pixels and form controls their current values, which a
+ * plain clone would lose.
+ */
+function snapshot(nodes: Node[]): Node[] {
+  return nodes.map((node) => {
+    const copy = node.cloneNode(true);
+    if (!(node instanceof Element) || !(copy instanceof Element)) return copy;
+    const from = [node, ...node.querySelectorAll("*")];
+    const to = [copy, ...copy.querySelectorAll("*")];
+    from.forEach((el, k) => {
+      const c = to[k];
+      if (el instanceof HTMLCanvasElement && c instanceof HTMLCanvasElement) {
+        c.width = el.width;
+        c.height = el.height;
+        try {
+          c.getContext("2d")?.drawImage(el, 0, 0);
+        } catch {
+          // An empty canvas (or one we may not read) stays blank.
+        }
+      } else if (el instanceof HTMLInputElement && c instanceof HTMLInputElement) {
+        c.value = el.value;
+        c.checked = el.checked;
+      } else if (
+        (el instanceof HTMLSelectElement && c instanceof HTMLSelectElement) ||
+        (el instanceof HTMLTextAreaElement && c instanceof HTMLTextAreaElement)
+      ) {
+        c.value = el.value;
+      }
+    });
+    for (const el of to) el.removeAttribute("id");
+    copy.setAttribute("aria-hidden", "true");
+    if (copy instanceof HTMLElement) copy.inert = true;
+    return copy;
+  });
+}
+
 /** Add the expand control to a hydrated slot. Returns a cleanup function. */
 export function makeExpandable(slot: HTMLElement): () => void {
   const name = slot.querySelector(".interactive-title")?.textContent?.trim() || "interactive figure";
@@ -65,27 +104,45 @@ export function makeExpandable(slot: HTMLElement): () => void {
   slot.append(open);
 
   let dialog: HTMLDialogElement | null = null;
+  let body: HTMLDivElement | null = null;
   let closing = false;
+  /** The live figure, while it is in the dialog. */
   let moved: Node[] = [];
+  /** The snapshot holding its place in the page meanwhile. */
+  let standIn: Node[] = [];
 
-  function restore() {
-    if (!dialog) return;
+  /** Move the live figure back into the page; returns a snapshot of it. */
+  function putBack(): Node[] {
+    if (!moved.length) return [];
+    const shadow = snapshot(moved);
+    for (const n of standIn) n.parentNode?.removeChild(n);
+    standIn = [];
     slot.append(...moved, open);
     moved = [];
+    return shadow;
+  }
+
+  function finish() {
+    if (!dialog) return;
+    putBack();
     slot.style.minHeight = "";
     document.documentElement.classList.remove("has-interactive-dialog");
     dialog.remove();
     dialog = null;
+    body = null;
     closing = false;
     open.focus({ preventScroll: true });
-    void fade(slot, 0, 1);
   }
 
-  /** Fade the dialog out, then close it; `close` puts the figure back. */
+  /**
+   * Put the live figure back in the page first, so it is already there as
+   * the dialog fades out over a snapshot of its expanded layout.
+   */
   function dismiss() {
     const d = dialog;
-    if (!d || closing) return;
+    if (!d || !body || closing) return;
     closing = true;
+    body.append(...putBack());
     void fade(d, 1, 0, true).then(() => d.close());
   }
 
@@ -94,6 +151,7 @@ export function makeExpandable(slot: HTMLElement): () => void {
     // Hold the slot's place so the text doesn't jump while the figure is away.
     slot.style.minHeight = `${slot.offsetHeight}px`;
     moved = [...slot.childNodes].filter((n) => n !== open);
+    standIn = snapshot(moved);
     open.remove();
 
     const d = document.createElement("dialog");
@@ -101,9 +159,10 @@ export function makeExpandable(slot: HTMLElement): () => void {
     d.setAttribute("aria-label", name);
     const close = iconButton("interactive-collapse", CLOSE_ICON, "Close expanded view");
     close.addEventListener("click", dismiss);
-    const body = document.createElement("div");
+    body = document.createElement("div");
     body.className = "interactive-dialog-body";
     body.append(...moved);
+    slot.append(...standIn);
     d.append(close, body);
     // A click on the backdrop lands on the dialog itself, not on its content.
     d.addEventListener("click", (e) => {
@@ -115,7 +174,7 @@ export function makeExpandable(slot: HTMLElement): () => void {
       e.preventDefault();
       dismiss();
     });
-    d.addEventListener("close", restore);
+    d.addEventListener("close", finish);
 
     dialog = d;
     document.body.append(d);
@@ -129,7 +188,7 @@ export function makeExpandable(slot: HTMLElement): () => void {
   return () => {
     // `close` fires asynchronously; put the figure back now.
     dialog?.close();
-    restore();
+    finish();
     open.remove();
   };
 }
