@@ -1093,6 +1093,242 @@ html.has-interactive-dialog {
   }
 }
 
+.swe-interactive .swe-plot svg {
+  cursor: crosshair;
+}
+
+.swe-interactive .swe-plot svg.is-dragging,
+.swe-interactive .swe-plot svg.is-dragging .vec-hit {
+  cursor: grabbing;
+}
+
+.swe-interactive .swe-radius-hit {
+  cursor: ew-resize;
+}
+
+.swe-interactive .swe-handle,
+.swe-interactive .swe-inflow,
+.swe-interactive .swe-scale,
+.swe-interactive .swe-wall {
+  pointer-events: none;
+}
+
+.swe-interactive .swe-wall {
+  stroke-width: 5px;
+}
+
+.swe-interactive .halo {
+  paint-order: stroke;
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  font-family: var(--font-ui);
+}
+
+.swe-interactive .swe-failed {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 1.5rem;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-align: center;
+}
+
+.swe-interactive .swe-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1.1rem;
+  margin: 0.6rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.swe-interactive .swe-ramp {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+.swe-interactive .swe-ramp-bar {
+  display: inline-grid;
+  gap: 0.1rem;
+  width: 12rem;
+}
+
+.swe-interactive .swe-ramp-bar canvas {
+  display: block;
+  width: 100%;
+  height: 0.6rem;
+  border: 1px solid var(--rule);
+}
+
+.swe-interactive .swe-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.swe-interactive .swe-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.swe-interactive .swe-key i {
+  display: inline-block;
+  width: 1.1rem;
+  height: 4px;
+}
+
+.swe-interactive .swe-key i.ring {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 1px solid;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.swe-interactive .swe-key i.arrow {
+  height: 2.5px;
+  clip-path: polygon(0 0, 70% 0, 70% -150%, 100% 50%, 70% 250%, 70% 100%, 0 100%);
+}
+
+.swe-interactive .swe-eqs {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 2px solid var(--rule);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.swe-interactive .swe-eqs p {
+  margin: 0;
+}
+
+.swe-interactive .swe-eqs i {
+  font-style: italic;
+}
+
+.swe-interactive .swe-eqs .is-off {
+  color: var(--muted);
+  opacity: 0.6;
+  text-decoration: line-through;
+  text-decoration-color: var(--accent);
+}
+
+.swe-interactive .swe-eq-gap {
+  margin-left: 0.6rem;
+  white-space: nowrap;
+}
+
+.swe-interactive .swe-eqs .swe-eq-note {
+  margin-top: 0.3rem;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.swe-interactive .swe-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 1.25rem;
+  margin: 0.85rem 0 0.2rem;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+}
+
+.swe-interactive .swe-group {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.swe-interactive .swe-wide {
+  grid-column: 1 / -1;
+}
+
+.swe-interactive .swe-label {
+  color: var(--muted);
+}
+
+.swe-interactive .swe-sep {
+  width: 0.4rem;
+}
+
+.swe-interactive .swe-note {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+@media (max-width: 42rem) {
+  .swe-interactive .swe-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Expanded, as for the geostrophic map: the simulation on the left, as large
+   as the height allows, and the controls in a column beside it. */
+@media (min-width: 56rem) {
+  .interactive-dialog .swe-interactive {
+    display: grid;
+    grid-template-columns: minmax(0, calc((90vh - 7rem) * 1.6)) minmax(24rem, 1fr);
+    grid-template-columns: minmax(0, calc((90dvh - 7rem) * 1.6)) minmax(24rem, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "main head"
+      "main side"
+      "note side";
+    column-gap: 1.5rem;
+    align-content: start;
+    align-content: safe center;
+  }
+
+  .interactive-dialog .swe-interactive .swe-head,
+  .interactive-dialog .swe-interactive .swe-side {
+    max-width: 30rem;
+  }
+
+  .interactive-dialog .swe-interactive .swe-head {
+    grid-area: head;
+  }
+
+  .interactive-dialog .swe-interactive .swe-main {
+    grid-area: main;
+  }
+
+  .interactive-dialog .swe-interactive .swe-side {
+    grid-area: side;
+  }
+
+  .interactive-dialog .swe-interactive .swe-note {
+    grid-area: note;
+  }
+
+  .interactive-dialog .swe-interactive .rotation-controls,
+  .interactive-dialog .swe-interactive .swe-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .interactive-dialog .swe-interactive .swe-options {
+    gap: 0.4rem;
+  }
+
+  .interactive-dialog .swe-interactive .swe-group {
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
 .interactive .eos-canvas {
   cursor: crosshair;
 }
@@ -1290,7 +1526,12 @@ html.has-interactive-dialog {
   .book-figure .rotation-interactive .vec-hit,
   .book-figure .rotation-interactive .vec-tip,
   .book-figure .geostrophic-interactive .vector-callout,
-  .book-figure .geostrophic-interactive .geo-note {
+  .book-figure .geostrophic-interactive .geo-note,
+  .book-figure .swe-interactive .vector-callout,
+  .book-figure .swe-interactive .swe-eqs,
+  .book-figure .swe-interactive .swe-options,
+  .book-figure .swe-interactive .swe-note,
+  .book-figure .swe-interactive .vec-hit {
     display: none !important;
   }
 
