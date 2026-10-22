@@ -1195,6 +1195,12 @@ html.has-interactive-dialog {
   opacity: 0.6;
 }
 
+.swe-interactive .swe-key i.trail {
+  height: 1.5px;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000);
+  mask-image: linear-gradient(to right, transparent, #000);
+}
+
 .swe-interactive .swe-key i.arrow {
   height: 2.5px;
   clip-path: polygon(0 0, 70% 0, 70% -150%, 100% 50%, 70% 250%, 70% 100%, 0 100%);

@@ -44,6 +44,8 @@ export type Stats = {
   u: number;
   v: number;
   eta: number;
+  /** Largest speed |(U + u′, v)|, at the cell centers. */
+  speed: number;
   /** True if any value is not finite. */
   bad: boolean;
 };
@@ -51,7 +53,10 @@ export type Stats = {
 export type Probe = { u: number; v: number; eta: number; depth: number };
 
 export type View = {
-  field: 0 | 1 | 2;
+  /** η, u, v, or speed. */
+  field: 0 | 1 | 2 | 3;
+  /** The inflow, which the speed includes. */
+  U: number;
   /** Half-range of the color scale, about zero. */
   range: number;
   /** Contour interval for filled contours; 0 for a heat map. */
@@ -296,23 +301,29 @@ void main() {
   outQ = q;
 }`;
 
-/** Largest |u′|, |v|, |η′| per block; w flags anything not finite. */
+/** Largest |u′|, |v|, |η′|, and speed per block; w is −1 if anything is not finite. */
 const REDUCE = `${COMMON}
+uniform float uU;
 out vec4 outQ;
 void main() {
   ivec2 b = ivec2(gl_FragCoord.xy) * ${BLOCK};
   vec4 m = vec4(0.0);
+  bool bad = false;
   for (int dj = 0; dj < ${BLOCK}; dj++) {
     for (int di = 0; di < ${BLOCK}; di++) {
       ivec2 ij = b + ivec2(di, dj);
       if (ij.x >= uN.x || ij.y >= uN.y) continue;
       vec3 q = abs(texelFetch(uQ, ij, 0).rgb);
       // NaN fails every comparison, so it lands here too.
-      if (!all(lessThan(q, vec3(1e20)))) m.w = 1.0;
-      else m.xyz = max(m.xyz, q);
+      if (!all(lessThan(q, vec3(1e20)))) {
+        bad = true;
+        continue;
+      }
+      vec2 c = vec2(uU + 0.5 * (qu(ij.x, ij.y) + qu(ij.x + 1, ij.y)), 0.5 * (qv(ij.x, ij.y) + qv(ij.x, ij.y + 1)));
+      m = max(m, vec4(q, length(c)));
     }
   }
-  outQ = m;
+  outQ = bad ? vec4(m.xyz, -1.0) : m;
 }`;
 
 /** (u′, v, η′, resting depth) at one point. */
@@ -326,21 +337,31 @@ void main() {
 /** Color the chosen field over the whole domain. */
 const DISPLAY = `${COMMON}
 uniform int uField;
+uniform float uU;
 uniform float uRange;
 uniform float uStep;
 uniform vec4 uInk;
 uniform sampler2D uLut;
+uniform sampler2D uSeq;
 in vec2 vUv;
 out vec4 outColor;
 
+// Signed fields on a diverging map about zero; speed on a sequential one.
 vec3 lut(float s) {
+  if (uField == 3) {
+    float t = clamp(s / uRange, 0.0, 1.0);
+    return texture(uSeq, vec2((t * 255.0 + 0.5) / 256.0, 0.5)).rgb;
+  }
   float t = 0.5 + 0.5 * clamp(s / uRange, -1.0, 1.0);
   return texture(uLut, vec2((t * 255.0 + 0.5) / 256.0, 0.5)).rgb;
 }
 
 void main() {
   vec2 p = vUv * vec2(uN) * uD;
-  float s = uField == 0 ? sampleE(p) : (uField == 1 ? sampleU(p) : sampleV(p));
+  float s = uField == 0 ? sampleE(p)
+          : uField == 1 ? sampleU(p)
+          : uField == 2 ? sampleV(p)
+          : length(vec2(uU + sampleU(p), sampleV(p)));
   vec3 col;
   if (uStep > 0.0) {
     float w = s / uStep;
@@ -373,9 +394,11 @@ export class ShallowWaterGL {
   private probeTex: WebGLTexture;
   private probeFbo: WebGLFramebuffer;
   private lutTex: WebGLTexture;
+  private seqTex: WebGLTexture;
   private progs: Record<"step" | "div" | "damp" | "bump" | "reduce" | "probe" | "display", Program>;
   private redBuf = new Float32Array(RX * RY * 4);
   private probeBuf = new Float32Array(4);
+  private stateBuf = new Float32Array(NX * NY * 4);
 
   /** Returns null when WebGL 2 or float render targets are unavailable. */
   static create(canvas: HTMLCanvasElement): ShallowWaterGL | null {
@@ -418,13 +441,8 @@ export class ShallowWaterGL {
     [this.redTex, this.redFbo] = this.target(RX, RY);
     [this.probeTex, this.probeFbo] = this.target(1, 1);
 
-    this.lutTex = gl.createTexture()!;
-    gl.bindTexture(gl.TEXTURE_2D, this.lutTex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(256 * 4));
+    this.lutTex = this.lutTarget();
+    this.seqTex = this.lutTarget();
 
     const status = (() => {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo[0]);
@@ -476,6 +494,18 @@ export class ShallowWaterGL {
     gl.bindFramebuffer(gl.FRAMEBUFFER, f);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
     return [t, f];
+  }
+
+  private lutTarget(): WebGLTexture {
+    const gl = this.gl;
+    const t = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(256 * 4));
+    return t;
   }
 
   /** Bind a program, the grid uniforms, and the state texture as uQ. */
@@ -554,20 +584,31 @@ export class ShallowWaterGL {
     this.cur = to;
   }
 
-  stats(s: Settings): Stats {
+  stats(s: Settings, U: number): Stats {
     const gl = this.gl;
-    this.use(this.progs.reduce, s, this.cur);
+    const p = this.progs.reduce;
+    this.use(p, s, this.cur);
+    gl.uniform1f(p.loc("uU"), s.wallX ? 0 : U);
     this.draw(this.redFbo, RX, RY);
     gl.readPixels(0, 0, RX, RY, gl.RGBA, gl.FLOAT, this.redBuf);
-    const out: Stats = { u: 0, v: 0, eta: 0, bad: false };
+    const out: Stats = { u: 0, v: 0, eta: 0, speed: 0, bad: false };
     const r = this.redBuf;
     for (let k = 0; k < RX * RY; k++) {
-      if (r[k * 4 + 3] > 0 || !Number.isFinite(r[k * 4] + r[k * 4 + 1] + r[k * 4 + 2])) out.bad = true;
+      if (r[k * 4 + 3] < 0 || !Number.isFinite(r[k * 4] + r[k * 4 + 1] + r[k * 4 + 2] + r[k * 4 + 3])) out.bad = true;
       out.u = Math.max(out.u, r[k * 4]);
       out.v = Math.max(out.v, r[k * 4 + 1]);
       out.eta = Math.max(out.eta, r[k * 4 + 2]);
+      out.speed = Math.max(out.speed, r[k * 4 + 3]);
     }
     return out;
+  }
+
+  /** The whole state, (u′, v, η′, ·) per cell; the array is reused. */
+  readState(): Float32Array {
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo[this.cur]);
+    gl.readPixels(0, 0, NX, NY, gl.RGBA, gl.FLOAT, this.stateBuf);
+    return this.stateBuf;
   }
 
   probe(s: Settings, x: number, y: number): Probe {
@@ -581,10 +622,13 @@ export class ShallowWaterGL {
     return { u, v, eta, depth };
   }
 
-  setLut(lut: Uint8Array) {
+  /** The diverging map for η, u, and v, and the sequential one for speed. */
+  setLuts(diverging: Uint8Array, sequential: Uint8Array) {
     const gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, this.lutTex);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RGBA, gl.UNSIGNED_BYTE, lut);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RGBA, gl.UNSIGNED_BYTE, diverging);
+    gl.bindTexture(gl.TEXTURE_2D, this.seqTex);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RGBA, gl.UNSIGNED_BYTE, sequential);
   }
 
   /** Draw the field into the canvas at its current pixel size. */
@@ -593,12 +637,16 @@ export class ShallowWaterGL {
     const p = this.progs.display;
     this.use(p, s, this.cur);
     gl.uniform1i(p.loc("uField"), view.field);
+    gl.uniform1f(p.loc("uU"), s.wallX ? 0 : view.U);
     gl.uniform1f(p.loc("uRange"), view.range);
     gl.uniform1f(p.loc("uStep"), view.step);
     gl.uniform4f(p.loc("uInk"), ...view.ink);
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.lutTex);
     gl.uniform1i(p.loc("uLut"), 1);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, this.seqTex);
+    gl.uniform1i(p.loc("uSeq"), 2);
     this.draw(null, gl.drawingBufferWidth, gl.drawingBufferHeight);
   }
 
@@ -611,7 +659,7 @@ export class ShallowWaterGL {
 
   dispose() {
     const gl = this.gl;
-    for (const t of [...this.tex, this.redTex, this.probeTex, this.lutTex]) gl.deleteTexture(t);
+    for (const t of [...this.tex, this.redTex, this.probeTex, this.lutTex, this.seqTex]) gl.deleteTexture(t);
     for (const f of [...this.fbo, this.redFbo, this.probeFbo]) gl.deleteFramebuffer(f);
     for (const p of Object.values(this.progs)) gl.deleteProgram(p.prog);
     gl.deleteBuffer(this.buf);

@@ -28,6 +28,8 @@
     isobathRadius,
     mountHeight,
     niceStep,
+    sampleFlow,
+    speedLut,
     timeLabel,
     toView,
     type ExperimentId,
@@ -42,15 +44,23 @@
   const RAMP = 1e4;
   /** Seconds of animation over which the color scale relaxes downward. */
   const RANGE_RELAX = 1.5;
-  /** Most time steps per frame; the GPU budget below may allow fewer. */
-  const SPEED_MAX = 7;
   const ARROW_PX = 46;
+
+  const PARTICLES = 1500;
+  const TRAIL = 28;
+  const ALPHA_BINS = 8;
+  /**
+   * Particle step, in plot pixels per 60 Hz frame, at the top of the speed
+   * scale. The water itself moves far too slowly to watch, so the particles
+   * trace the flow as it is at each moment rather than keeping model time.
+   */
+  const STEP_PX = 1.8;
+  const MAX_STEP = 3;
 
   const copy = (s: Settings): Settings => ({ ...s, mount: { ...s.mount } });
 
   let expId = $state<ExperimentId>("seamount");
   let s = $state<Settings>(copy(EXPERIMENTS.seamount.settings));
-  let speed = $state(5);
   let playing = $state(true);
   let theme = $state<Theme | null>(null);
   let selected = $state(false);
@@ -61,12 +71,13 @@
 
   // Read back from the GPU a few times a second, for the readouts.
   let reading = $state<Probe>({ u: 0, v: 0, eta: 0, depth: 100 });
-  let shown = $state({ t: 0, range: 1, step: 0, U: 0, rate: 0, vmax: 1, steps: 32 });
+  let shown = $state({ t: 0, range: 1, step: 0, U: 0, rate: 0, vmax: 1 });
 
   let rootEl: HTMLDivElement | undefined;
   let plotEl: HTMLDivElement | undefined;
   let svgEl: SVGSVGElement | undefined;
   let glEl: HTMLCanvasElement | undefined;
+  let flowEl: HTMLCanvasElement | undefined;
   let rampEl: HTMLCanvasElement | undefined;
 
   const f = $derived(s.fScaled * 1e-4);
@@ -89,10 +100,16 @@
     { id: "eta", label: "η", name: "surface height η" },
     { id: "u", label: "u", name: "eastward velocity u" },
     { id: "v", label: "v", name: "northward velocity v" },
+    { id: "speed", label: "|u|", name: "speed |u|, with particles moving along the flow" },
   ];
+  const FIELD_INDEX: Record<Field, 0 | 1 | 2 | 3> = { eta: 0, u: 1, v: 2, speed: 3 };
   const unit = $derived(s.field === "eta" ? "m" : "m/s");
-  /** The u field is drawn about the inflow, so its ticks are offset by it. */
-  const offset = $derived(s.field === "u" ? shown.U : 0);
+  /** Speed runs up from zero; the rest are signed, and u is drawn about the inflow. */
+  const ticks = $derived.by(() => {
+    if (s.field === "speed") return [0, shown.range / 2, shown.range];
+    const mid = s.field === "u" ? shown.U : 0;
+    return [mid - shown.range, mid, mid + shown.range];
+  });
 
   function sci(x: number): { m: string; e: number } {
     if (!Number.isFinite(x) || x === 0) return { m: "0", e: 0 };
@@ -190,8 +207,6 @@
   let uEff = 0;
   let range = 0;
   let rangeField: Field | null = null;
-  /** Steps per frame the GPU keeps up with; adapted from the frame cost. */
-  let budget = 32;
   let rate = 0;
   let dirty = true;
   let bumps: { x: number; y: number; amp: number }[] = [];
@@ -224,27 +239,26 @@
     return field === "eta" ? 1e-4 * cfg.H : 1e-4 * Math.sqrt(cfg.g * cfg.H);
   }
 
+  function fieldMax(field: Field, st: Stats): number {
+    return field === "eta" ? st.eta : field === "u" ? st.u : field === "v" ? st.v : st.speed;
+  }
+
   function frame(wall: number) {
     if (!sim) return;
     const cfg = $state.snapshot(s) as Settings;
     let advanced = 0;
-    const t0 = performance.now();
     if (playing) {
-      const n = Math.min(2 ** speed, budget);
+      // One time step per frame, as long as stability allows.
       const dt = ShallowWaterGL.maxDt(cfg, Math.max(uEff, cfg.U), stats);
-      const target = cfg.wallX ? 0 : cfg.U;
-      for (let k = 0; k < n; k++) {
-        uEff += (target - uEff) * (1 - Math.exp(-dt / RAMP));
-        if (cfg.wallX) uEff = 0;
-        sim.step(cfg, uEff, dt);
-      }
-      t += n * dt;
-      advanced = n * dt;
+      uEff = cfg.wallX ? 0 : uEff + (cfg.U - uEff) * (1 - Math.exp(-dt / RAMP));
+      sim.step(cfg, uEff, dt);
+      t += dt;
+      advanced = dt;
     }
     for (const b of bumps) sim.bump(cfg, b.x, b.y, BUMP_R, b.amp);
     bumps = [];
 
-    stats = sim.stats(cfg);
+    stats = sim.stats(cfg, uEff);
     const c0 = Math.sqrt(cfg.g * cfg.H);
     if (stats.bad || stats.eta > 5 * cfg.H || Math.max(stats.u, stats.v) > 20 * c0) {
       notice = "The solution blew up, so it was restarted and paused. Try a smaller inflow, a deeper seamount peak, or the linear equations.";
@@ -254,19 +268,10 @@
     }
     const probed = sim.probe(cfg, probe.x, probe.y);
 
-    if (playing) {
-      const work = performance.now() - t0;
-      const n = Math.min(2 ** speed, budget);
-      if (work > 16 && n > 1) budget = Math.max(1, Math.floor(n * 0.75));
-      else if (work < 9 && n === budget) budget = Math.min(2 ** SPEED_MAX, budget + Math.max(1, budget >> 3));
-      if (wall > 0) rate += (advanced / wall - rate) * 0.1;
-    }
+    if (playing && wall > 0) rate += (advanced / wall - rate) * 0.1;
 
     // Color scale: up at once, down slowly, so a decaying field is seen to decay.
-    const want = Math.max(
-      floorFor(cfg.field, cfg),
-      cfg.field === "eta" ? stats.eta : cfg.field === "u" ? stats.u : stats.v,
-    );
+    const want = Math.max(floorFor(cfg.field, cfg), fieldMax(cfg.field, stats));
     if (rangeField !== cfg.field || want > range) range = want;
     else range += (want - range) * (1 - Math.exp(-wall / RANGE_RELAX));
     rangeField = cfg.field;
@@ -274,11 +279,28 @@
 
     const ink = parseRgb(theme?.fg ?? "#1c1915") ?? [28, 25, 21];
     sim.render(cfg, {
-      field: cfg.field === "eta" ? 0 : cfg.field === "u" ? 1 : 2,
+      field: FIELD_INDEX[cfg.field],
+      U: uEff,
       range,
       step,
       ink: [ink[0] / 255, ink[1] / 255, ink[2] / 255, theme && darkTheme(theme) ? 0.45 : 0.35],
     });
+
+    if (cfg.field === "speed") {
+      const q = sim.readState();
+      const U = uEff;
+      flowAt = (x, y) => sampleFlow(q, cfg, U, x / PX_PER_M, (VIEW_H - y) / PX_PER_M);
+      if (!tracing) {
+        tracing = true;
+        seedParticles();
+        retrace();
+      } else if (playing) advance(Math.min(1 / 30, wall));
+      else retrace();
+      drawParticles();
+    } else if (tracing) {
+      tracing = false;
+      clearParticles();
+    }
 
     sinceReadout += wall;
     if (sinceReadout > 0.07 || !playing) {
@@ -290,8 +312,7 @@
         step,
         U: uEff,
         rate: playing ? rate : shown.rate,
-        vmax: Math.max(Math.abs(uEff) + stats.u, stats.v, 1e-3 * c0),
-        steps: Math.min(2 ** speed, budget),
+        vmax: Math.max(stats.speed, 1e-3 * c0),
       };
     }
     dirty = false;
@@ -416,22 +437,25 @@
   // ---- Color bar -----------------------------------------------------------
 
   let lut: Uint8Array | null = null;
+  let seq: Uint8Array | null = null;
 
-  function paintRamp() {
-    if (!rampEl || !lut) return;
+  function paintRamp(field: Field) {
+    if (!rampEl || !lut || !seq) return;
     const ctx = rampEl.getContext("2d");
     if (!ctx) return;
     rampEl.width = 256;
     rampEl.height = 1;
     const img = ctx.createImageData(256, 1);
+    const signed = field !== "speed";
     for (let i = 0; i < 256; i++) {
-      let x = (i / 255) * 2 - 1;
+      // Fraction of the half-range for signed fields, of the range for speed.
+      let x = signed ? (i / 255) * 2 - 1 : i / 255;
       if (shown.step > 0) {
         const w = (x * shown.range) / shown.step;
         x = ((Math.floor(w) + 0.5) * shown.step) / shown.range;
       }
-      const k = Math.round(clamp(0.5 + 0.5 * x, 0, 1) * 255) * 4;
-      img.data.set(lut.subarray(k, k + 4), i * 4);
+      const k = Math.round(clamp(signed ? 0.5 + 0.5 * x : x, 0, 1) * 255) * 4;
+      img.data.set((signed ? lut : seq).subarray(k, k + 4), i * 4);
     }
     ctx.putImageData(img, 0, 0);
   }
@@ -439,7 +463,8 @@
   $effect(() => {
     if (!theme) return;
     lut = divergingLut(theme);
-    sim?.setLut(lut);
+    seq = speedLut(theme);
+    sim?.setLuts(lut, seq);
     dirty = true;
   });
 
@@ -447,8 +472,153 @@
     shown.range;
     shown.step;
     theme;
-    paintRamp();
+    paintRamp(s.field);
   });
+
+  // ---- Particles -----------------------------------------------------------
+
+  // As in the geostrophic flow app: each particle keeps its last TRAIL
+  // positions, in plot pixels, in a ring shared by all particles, so trails
+  // are redrawn from scratch every frame and never leave ghosts behind.
+  const px = new Float32Array(PARTICLES * TRAIL);
+  const py = new Float32Array(PARTICLES * TRAIL);
+  const len = new Uint8Array(PARTICLES);
+  const life = new Uint16Array(PARTICLES);
+  const maxLife = new Uint16Array(PARTICLES);
+  /** Local speed as a fraction of the color scale, to fade still water. */
+  const vis = new Float32Array(PARTICLES);
+  let head = 0;
+  let cssWidth = VIEW_W;
+  let tracing = false;
+  /** Velocity (east, north) in m/s at a plot point, from the latest read-back. */
+  let flowAt: (x: number, y: number) => [number, number] = () => [0, 0];
+
+  function spawn(i: number, at: number) {
+    px[i * TRAIL + at] = Math.random() * VIEW_W;
+    py[i * TRAIL + at] = Math.random() * VIEW_H;
+    len[i] = 1;
+    life[i] = 0;
+    maxLife[i] = 60 + Math.floor(Math.random() * 120);
+  }
+
+  function seedParticles() {
+    for (let i = 0; i < PARTICLES; i++) {
+      spawn(i, head);
+      // Stagger ages so particles don't all respawn on the same frame.
+      life[i] = Math.floor(Math.random() * maxLife[i]);
+    }
+  }
+
+  function advance(dt: number) {
+    const k = (STEP_PX * dt * 60) / range;
+    const cap = MAX_STEP * dt * 60;
+    const prev = head;
+    head = (head + 1) % TRAIL;
+    for (let i = 0; i < PARTICLES; i++) {
+      const x = px[i * TRAIL + prev];
+      const y = py[i * TRAIL + prev];
+      life[i]++;
+      if (life[i] > maxLife[i]) {
+        spawn(i, head);
+        continue;
+      }
+      const [ue, vn] = flowAt(x, y);
+      vis[i] = Math.min(1, Math.hypot(ue, vn) / (0.15 * range));
+      let dx = ue * k;
+      let dy = -vn * k;
+      const step = Math.hypot(dx, dy);
+      if (step > cap) {
+        dx *= cap / step;
+        dy *= cap / step;
+      }
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || nx > VIEW_W || ny < 0 || ny > VIEW_H) {
+        spawn(i, head);
+        continue;
+      }
+      px[i * TRAIL + head] = nx;
+      py[i * TRAIL + head] = ny;
+      if (len[i] < TRAIL) len[i]++;
+    }
+  }
+
+  /**
+   * Redraw the trails of particles frozen where they are by tracing each one
+   * back along the current flow, for a still frame that Play resumes from.
+   */
+  function retrace() {
+    const k = STEP_PX / range;
+    for (let i = 0; i < PARTICLES; i++) {
+      let x = px[i * TRAIL + head];
+      let y = py[i * TRAIL + head];
+      const [u0, v0] = flowAt(x, y);
+      vis[i] = Math.min(1, Math.hypot(u0, v0) / (0.15 * range));
+      let n = 1;
+      for (; n < TRAIL; n++) {
+        const [ue, vn] = flowAt(x, y);
+        let dx = -ue * k;
+        let dy = vn * k;
+        const d = Math.hypot(dx, dy);
+        if (d > MAX_STEP) {
+          dx *= MAX_STEP / d;
+          dy *= MAX_STEP / d;
+        }
+        x += dx;
+        y += dy;
+        if (x < 0 || x > VIEW_W || y < 0 || y > VIEW_H) break;
+        const at = (head - n + TRAIL) % TRAIL;
+        px[i * TRAIL + at] = x;
+        py[i * TRAIL + at] = y;
+      }
+      len[i] = n;
+    }
+  }
+
+  function drawParticles() {
+    if (!flowEl) return;
+    const ctx = flowEl.getContext("2d");
+    if (!ctx) return;
+    const sc = flowEl.width / VIEW_W;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, flowEl.width, flowEl.height);
+    ctx.setTransform(sc, 0, 0, sc, 0, 0);
+
+    const paths = Array.from({ length: ALPHA_BINS }, () => new Path2D());
+    const fade = 12;
+    for (let i = 0; i < PARTICLES; i++) {
+      const n = len[i];
+      if (n < 2) continue;
+      const env = Math.min(1, life[i] / fade, (maxLife[i] - life[i]) / fade) * vis[i];
+      for (let sgm = 0; sgm < n - 1; sgm++) {
+        const a = (((head - sgm) % TRAIL) + TRAIL) % TRAIL;
+        const b = (a - 1 + TRAIL) % TRAIL;
+        const alpha = (1 - sgm / (TRAIL - 1)) * env;
+        const bin = Math.min(ALPHA_BINS - 1, Math.floor(alpha * ALPHA_BINS));
+        if (bin <= 0) continue;
+        const path = paths[bin];
+        path.moveTo(px[i * TRAIL + a], py[i * TRAIL + a]);
+        path.lineTo(px[i * TRAIL + b], py[i * TRAIL + b]);
+      }
+    }
+    ctx.strokeStyle = fg;
+    ctx.lineCap = "butt";
+    ctx.lineWidth = 1.3 * (VIEW_W / cssWidth);
+    // Dark ink on a light map reads heavier than light ink on a dark one.
+    const top = theme && darkTheme(theme) ? 0.9 : 0.7;
+    for (let b = 1; b < ALPHA_BINS; b++) {
+      ctx.globalAlpha = (top * (b + 0.5)) / ALPHA_BINS;
+      ctx.stroke(paths[b]);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function clearParticles() {
+    const ctx = flowEl?.getContext("2d");
+    if (!flowEl || !ctx) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, flowEl.width, flowEl.height);
+  }
 
   // Anything the reader changes redraws a paused frame.
   $effect(() => {
@@ -485,7 +655,7 @@
       failed = "This simulation needs WebGL 2 with floating-point render targets, which this browser does not provide.";
       return false;
     }
-    if (lut) sim.setLut(lut);
+    if (lut && seq) sim.setLuts(lut, seq);
     restart();
     return true;
   }
@@ -495,11 +665,13 @@
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) playing = false;
 
     const resize = new ResizeObserver(() => {
-      if (!plotEl || !glEl) return;
+      if (!plotEl || !glEl || !flowEl) return;
       const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const w = plotEl.clientWidth || VIEW_W;
-      glEl.width = Math.round(w * dpr);
-      glEl.height = Math.round(((w * VIEW_H) / VIEW_W) * dpr);
+      cssWidth = plotEl.clientWidth || VIEW_W;
+      for (const el of [glEl, flowEl]) {
+        el.width = Math.round(cssWidth * dpr);
+        el.height = Math.round(((cssWidth * VIEW_H) / VIEW_W) * dpr);
+      }
       dirty = true;
     });
     if (plotEl) resize.observe(plotEl);
@@ -552,6 +724,7 @@
   <div class="swe-main">
     <div class="field-plot swe-plot" bind:this={plotEl}>
       <canvas bind:this={glEl} class="field-heat" aria-hidden="true"></canvas>
+      <canvas bind:this={flowEl} class="field-heat" aria-hidden="true"></canvas>
       {#if failed}
         <p class="swe-failed">{failed}</p>
       {/if}
@@ -662,9 +835,9 @@
         <span class="swe-ramp-bar">
           <canvas bind:this={rampEl}></canvas>
           <span class="swe-ticks">
-            <span>{sig(offset - shown.range)}</span>
-            <span>{sig(offset)}</span>
-            <span>{sig(offset + shown.range)} {unit}</span>
+            <span>{sig(ticks[0])}</span>
+            <span>{sig(ticks[1])}</span>
+            <span>{sig(ticks[2])} {unit}</span>
           </span>
         </span>
       </span>
@@ -673,6 +846,9 @@
       {/if}
       {#if s.wallX || s.wallY}
         <span class="swe-key"><i style:background={fg}></i>walls</span>
+      {/if}
+      {#if s.field === "speed"}
+        <span class="swe-key"><i class="trail" style:background={fg}></i>particles moving along the flow</span>
       {/if}
       <span class="swe-key"><i class="arrow" style:background={fg}></i>velocity at the probe</span>
     </div>
@@ -710,7 +886,7 @@
 
     <div class="readout">
       <span>(u, v)</span>
-      <span>= ({fmt(shown.U + reading.u, 2)}, {fmt(reading.v, 2)}) m/s</span>
+      <span>= ({fmt(shown.U + reading.u, 2)}, {fmt(reading.v, 2)}) m/s, |u| = {fmt(Math.hypot(shown.U + reading.u, reading.v), 2)} m/s</span>
       <span>η, h</span>
       <span>= {sig(reading.eta)} m, {fmt(reading.depth + reading.eta, reading.depth < 100 ? 1 : 0)} m</span>
       <span>c = √(gH)</span>
@@ -835,13 +1011,6 @@
           oninput={(e) => setRadius(Number(e.currentTarget.value))}
         />
       </label>
-      <label>
-        <span>Speed</span>
-        <span>
-          {2 ** speed} step{speed ? "s" : ""} per frame{#if playing && shown.steps < 2 ** speed}&nbsp;(GPU keeps up with {shown.steps}){/if}
-        </span>
-        <input type="range" min="0" max={SPEED_MAX} step="1" bind:value={speed} />
-      </label>
     </div>
 
     <div class="controls vector-actions" role="group" aria-label="Run">
@@ -857,7 +1026,8 @@
     The domain is {LX / 1000} × {LY / 1000} km, solved on a {NX} × {NY} grid ({fmt(DX / 1000, 1)} km cells) on the GPU.
     Bumps are {fmt(BUMP_FRAC * 100, 0)}% of H high. With an inflow and rotation, η leaves out the steady tilt −fUy/g that
     holds U in geostrophic balance.
-    {#if shown.rate > 0}One second of animation is about {timeLabel(shown.rate)} of model time.{/if}
+    {#if shown.rate > 0}One second of animation is about {timeLabel(shown.rate)} of model time, one time step per frame.{/if}
+    {#if s.field === "speed"}The particles trace the flow as it is at each moment, far faster than the water moves.{/if}
     Choosing an experiment loads its setup; Restart runs it again with the current settings.
   </p>
 </div>

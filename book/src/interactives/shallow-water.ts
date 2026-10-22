@@ -9,6 +9,7 @@
  */
 
 import { divergingColor, type RGB } from "./field-plot";
+import { speedRamp } from "./geostrophic";
 import type { Theme } from "./plot";
 
 /** Grid cells. */
@@ -43,7 +44,7 @@ export const R_MAX = 150e3;
 export const BUMP_FRAC = 0.1;
 export const BUMP_R = 30e3;
 
-export type Field = "eta" | "u" | "v";
+export type Field = "eta" | "u" | "v" | "speed";
 export type Style = "heat" | "filled";
 
 export type Seamount = {
@@ -174,6 +175,49 @@ export function niceStep(x: number): number {
   const m = x / 10 ** e;
   const n = m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10;
   return n * 10 ** e;
+}
+
+/**
+ * Velocity (east, north) in m/s at a point in meters, from a read-back state
+ * of (u′, v, η′) texels, adding the inflow U. Bilinear on each staggered
+ * lattice; at a wall the normal velocity is zero and the rest is held level.
+ */
+export function sampleFlow(q: Float32Array, s: Settings, U: number, x: number, y: number): [number, number] {
+  const center = (i: number, n: number, wall: boolean) =>
+    wall ? Math.min(n - 1, Math.max(0, i)) : ((i % n) + n) % n;
+  const uAt = (i: number, j: number) => {
+    if (s.wallX && (i <= 0 || i >= NX)) return 0;
+    return q[(center(j, NY, s.wallY) * NX + center(i, NX, false)) * 4];
+  };
+  const vAt = (i: number, j: number) => {
+    if (s.wallY && (j <= 0 || j >= NY)) return 0;
+    return q[(center(j, NY, false) * NX + center(i, NX, s.wallX)) * 4 + 1];
+  };
+  const lerp = (at: (i: number, j: number) => number, gx: number, gy: number) => {
+    const i = Math.floor(gx);
+    const j = Math.floor(gy);
+    const tx = gx - i;
+    const ty = gy - j;
+    return (
+      (at(i, j) * (1 - tx) + at(i + 1, j) * tx) * (1 - ty) +
+      (at(i, j + 1) * (1 - tx) + at(i + 1, j + 1) * tx) * ty
+    );
+  };
+  return [
+    (s.wallX ? 0 : U) + lerp(uAt, x / DX, y / DY - 0.5),
+    lerp(vAt, x / DX - 0.5, y / DY),
+  ];
+}
+
+/** 256-entry RGBA color map for speed, shared with the geostrophic flow app. */
+export function speedLut(theme: Theme): Uint8Array {
+  const rgb = speedRamp(theme);
+  const lut = new Uint8Array(256 * 4);
+  for (let i = 0; i < 256; i++) {
+    lut.set(rgb.subarray(i * 3, i * 3 + 3), i * 4);
+    lut[i * 4 + 3] = 255;
+  }
+  return lut;
 }
 
 /** 256-entry RGBA color map, from cool (negative) to warm (positive). */
