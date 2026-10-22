@@ -346,6 +346,37 @@ from the starting equation without breaking any of the assumptions.
 Thus, to consider shallow water systems in a non-rotating frame, simply drop
 the Coriolis terms.
 
+### Solving the equations numerically
+
+Except in special cases, the full nonlinear equations
+(<a class="eqref" data-key="eq:shallow_water_final_scalar_u"></a>-<a class="eqref" data-key="eq:shallow_water_final_scalar_eta"></a>)
+have no analytical solution.
+They are, however, well suited to a numerical solution: three unknowns on a
+two-dimensional grid, each stepped forward in time by its own equation.
+Fig. <a class="ref" data-key="fig:shallow_water_simulation"></a> does exactly
+that, in real time, in your browser.
+Its experiments preview the solutions that we derive in the rest of this
+chapter: a bump of water radiates gravity waves and, with rotation, leaves some
+of itself behind in geostrophic balance; a bump against a wall turns into a
+Kelvin wave; and a uniform flow over a seamount is steered around it by the
+conservation of potential vorticity.
+A collapsing step of water, the dam break, shows most plainly what the
+nonlinear terms do: with them, the front running into shallower water steepens
+into a bore.
+Switch them off to see what the linearized equations that we use from here on
+keep, and what they miss.
+
+<figure class="book-figure" id="fig:shallow_water_simulation">
+  <div class="interactive-slot" data-interactive="shallow-water" data-expandable>
+    <img src="/figures/fig_shallow_water_simulation.png" alt="Surface height of a uniform flow from left to right over a Gaussian seamount in a rotating channel, with an anticyclone trapped above the seamount and a cyclone shed downstream." />
+  </div>
+  <figcaption>
+
+A numerical solution of the shallow water equations (<a class="eqref" data-key="eq:shallow_water_final_scalar_u"></a>-<a class="eqref" data-key="eq:shallow_water_final_scalar_eta"></a>) for a layer of mean depth $H$ over a Gaussian seamount, so that the water column thickness is $h = H_b + \eta$ with $H_b(x, y) = H - b_0 e^{-r^2/R^2}$, where $r$ is the distance from the seamount's center and $b_0$ its height. In the seamount experiment, a uniform flow $U$ enters from the left of a channel with walls at the top and bottom. With rotation, it is held in geostrophic balance by a steady cross-channel tilt of the surface, $-fUy/g$, which is left out of the plotted $\eta$. Show $\eta$, $u$, $v$, or the speed $|\mathbf{u}|$ as a heat map or as filled contours, with particles drifting along the flow to show its direction when the speed is shown; vary $g$, $H$, $f$ (including its sign), and $U$; drag the seamount to move it and set the depth above its peak and its radius; make each pair of edges periodic or closed by walls; and switch the nonlinear terms on or off. Double-click on the water to drop a bump in it. The equations are solved on a $256 \times 160$ Arakawa C grid on the GPU, with third-order Runge-Kutta time stepping, third-order upwind-biased advection, and a weak damping of divergent motion that removes grid-scale gravity waves and keeps bores from overshooting.
+
+  </figcaption>
+</figure>
+
 We now proceed to further simplify this equation set to derive a general
 solution for the shallow water equations.
 

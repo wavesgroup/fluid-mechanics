@@ -22,6 +22,7 @@ const registry: Record<string, Loader> = {
   "centrifugal-force": () => load(import("./CentrifugalForce.svelte")),
   "rotation-components": () => load(import("./RotationComponents.svelte")),
   "geostrophic-flow": () => load(import("./GeostrophicFlow.svelte")),
+  "shallow-water": () => load(import("./ShallowWater.svelte")),
   "python-playground": () => load(import("./PythonPlayground.svelte")),
 };
 
