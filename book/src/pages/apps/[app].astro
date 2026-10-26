@@ -1,0 +1,71 @@
+---
+import Base from "../../layouts/Base.astro";
+import { allApps, appHref, chapterName, type App } from "../../lib/apps";
+import { withBase } from "../../lib/paths";
+
+export async function getStaticPaths() {
+  const apps = await allApps();
+  return apps.map((app, i) => ({
+    params: { app: app.slug },
+    props: {
+      app,
+      prev: i > 0 ? apps[i - 1] : null,
+      next: i < apps.length - 1 ? apps[i + 1] : null,
+    },
+  }));
+}
+
+interface Props {
+  app: App;
+  prev: App | null;
+  next: App | null;
+}
+
+const { app, prev, next } = Astro.props;
+const { location } = app;
+const source = location
+  ? `${location.figure ? `Figure ${location.figure} in ` : ""}${chapterName(location.chapter)}`
+  : null;
+const gallery = { href: "/apps", title: "All apps" };
+const before = prev ? { href: appHref(prev.slug), title: prev.title } : gallery;
+const after = next ? { href: appHref(next.slug), title: next.title } : gallery;
+---
+
+<Base title={app.title} chapterTitle={app.title} description={app.description}>
+  <main class:list={["app-page", { "is-wide": app.wide }]} id="main">
+    <p class="chapter-kicker"><a href={withBase("/apps")}>Interactive apps</a></p>
+    <h1 class="chapter-title">{app.title}</h1>
+    <p class="app-lede">{app.description}</p>
+    {
+      location && (
+        <p class="app-source">
+          In the book: <a href={withBase(location.href)}>{source}</a>
+        </p>
+      )
+    }
+    <div class:list={["app-stage", { "is-wide": app.wide }]}>
+      {
+        app.starter ? (
+          <div class="interactive-slot" data-interactive={app.slug}><pre>{app.starter}</pre></div>
+        ) : (
+          <div class="interactive-slot" data-interactive={app.slug} set:html={location?.fallback ?? ""} />
+        )
+      }
+      <noscript><p class="app-nojs">This app needs JavaScript to run.</p></noscript>
+    </div>
+    <nav class="chapter-nav" aria-label="Adjacent apps">
+      <a href={withBase(before.href)}>
+        <span class="dir">Previous</span>
+        {before.title}
+      </a>
+      <a class="next" href={withBase(after.href)}>
+        <span class="dir">Next</span>
+        {after.title}
+      </a>
+    </nav>
+  </main>
+  <script>
+    import { hydrateInteractives } from "../../interactives/register";
+    hydrateInteractives(document, { standalone: true });
+  </script>
+</Base>

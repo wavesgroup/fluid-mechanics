@@ -126,8 +126,8 @@ import matplotlib.pyplot as plt
 <div class="interactive python-playground">
   <p class="interactive-title">Python</p>
   <p class="interactive-caption">
-    NumPy and Matplotlib run in the browser. Use this editor for the programming
-    exercises above. First run downloads the runtime and needs a network connection.
+    NumPy and Matplotlib run in the browser. First run downloads the runtime and
+    needs a network connection.
   </p>
   <div bind:this={editorHost} class="python-editor"></div>
   <div class="python-toolbar">

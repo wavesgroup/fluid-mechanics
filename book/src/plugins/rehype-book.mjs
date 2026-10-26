@@ -112,6 +112,11 @@ export function rehypeBook({ chaptersDir, bibPath, base = "/" } = {}) {
         ];
       }
 
+      // An anchor for the app's own page to link back to (see lib/apps.ts).
+      if (classes.includes("interactive-slot") && node.properties?.dataInteractive && !node.properties.id) {
+        node.properties.id = `app:${node.properties.dataInteractive}`;
+      }
+
       if (node.tagName === "img" && typeof node.properties?.src === "string") {
         node.properties.src = withBase(base, node.properties.src);
       }

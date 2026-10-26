@@ -97,11 +97,14 @@ function snapshot(nodes: Node[]): Node[] {
   });
 }
 
-/** Add the expand control to a hydrated slot. Returns a cleanup function. */
-export function makeExpandable(slot: HTMLElement): () => void {
+/**
+ * Add the expand control to a hydrated slot, in `tools`: the slot's corner
+ * controls, which stay behind in the page. Returns a cleanup function.
+ */
+export function makeExpandable(slot: HTMLElement, tools: HTMLElement): () => void {
   const name = slot.querySelector(".interactive-title")?.textContent?.trim() || "interactive figure";
   const open = iconButton("interactive-expand", EXPAND_ICON, `Expand ${name}`, "Expand");
-  slot.append(open);
+  tools.append(open);
 
   let dialog: HTMLDialogElement | null = null;
   let body: HTMLDivElement | null = null;
@@ -117,7 +120,7 @@ export function makeExpandable(slot: HTMLElement): () => void {
     const shadow = snapshot(moved);
     for (const n of standIn) n.parentNode?.removeChild(n);
     standIn = [];
-    slot.append(...moved, open);
+    slot.append(...moved, tools);
     moved = [];
     return shadow;
   }
@@ -150,9 +153,9 @@ export function makeExpandable(slot: HTMLElement): () => void {
     if (dialog) return;
     // Hold the slot's place so the text doesn't jump while the figure is away.
     slot.style.minHeight = `${slot.offsetHeight}px`;
-    moved = [...slot.childNodes].filter((n) => n !== open);
+    moved = [...slot.childNodes].filter((n) => n !== tools);
     standIn = snapshot(moved);
-    open.remove();
+    tools.remove();
 
     const d = document.createElement("dialog");
     d.className = "interactive-dialog";

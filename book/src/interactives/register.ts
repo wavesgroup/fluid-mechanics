@@ -1,5 +1,6 @@
 import { mount, unmount, type Component } from "svelte";
 import { makeExpandable } from "./expand";
+import { withBase } from "../lib/paths";
 
 type Loader = () => Promise<Component>;
 
@@ -57,7 +58,39 @@ function propsFor(name: string, node: HTMLElement): Record<string, string> {
   return { starter: readStarter(node) };
 }
 
-export function hydrateInteractives(root: ParentNode = document) {
+const OPEN_ICON =
+  '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 2h5v5M14 2L7.5 8.5M12 9.5V14H2V4h4.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+
+/**
+ * The controls in a hydrated slot's corner: a link to the app's own page
+ * (pages/apps/[app].astro, which every interactive has) and, if the slot opts
+ * in, the expand button.
+ */
+function addTools(node: HTMLElement, name: string): () => void {
+  const tools = document.createElement("div");
+  tools.className = "interactive-tools";
+  const title = node.querySelector(".interactive-title")?.textContent?.trim() || "this interactive figure";
+  const link = document.createElement("a");
+  link.className = "interactive-open";
+  link.href = withBase(`/apps/${name}`);
+  link.target = "_blank";
+  link.innerHTML = `${OPEN_ICON}<span>Open</span>`;
+  link.setAttribute("aria-label", `Open ${title} in its own page`);
+  link.title = "Open in its own page";
+  tools.append(link);
+  node.append(tools);
+  const collapse = node.hasAttribute("data-expandable") ? makeExpandable(node, tools) : null;
+  return () => {
+    collapse?.();
+    tools.remove();
+  };
+}
+
+/**
+ * Mount the interactives in `root`. In the book, each gets a link to its own
+ * page; pass `standalone` on that page itself.
+ */
+export function hydrateInteractives(root: ParentNode = document, { standalone = false } = {}) {
   const instances: ReturnType<typeof mount>[] = [];
   const cleanups: (() => void)[] = [];
   let disposed = false;
@@ -77,7 +110,7 @@ export function hydrateInteractives(root: ParentNode = document) {
         node.replaceChildren();
         node.dataset.hydrated = "true";
         instances.push(mount(Comp, { target: node, props }));
-        if (node.hasAttribute("data-expandable")) cleanups.push(makeExpandable(node));
+        if (!standalone) cleanups.push(addTools(node, name));
       },
       () => {
         // Leave the fallback in place if the chunk fails to load.

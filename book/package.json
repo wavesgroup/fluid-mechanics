@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "convert": "python3 scripts/convert_tex.py"
+    "convert": "python3 scripts/convert_tex.py",
+    "thumbnails": "node scripts/app-thumbnails.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.2.4",
