@@ -54,6 +54,7 @@ export function rehypeBook({ chaptersDir, bibPath, base = "/" } = {}) {
     const prefix = numberMatch ? (numberMatch[1] ?? null) : null;
 
     let eqCounter = 0;
+    const anchoredApps = new Set();
 
     visit(tree, "element", (node) => {
       const cls = node.properties?.className;
@@ -110,6 +111,14 @@ export function rehypeBook({ chaptersDir, bibPath, base = "/" } = {}) {
             children: [{ type: "text", value: text }],
           },
         ];
+      }
+
+      // An anchor for the app's own page to link back to (see lib/apps.ts), on
+      // the first slot for each app, so a reused one doesn't repeat the id.
+      const app = classes.includes("interactive-slot") && node.properties?.dataInteractive;
+      if (app && !anchoredApps.has(app)) {
+        anchoredApps.add(app);
+        node.properties.id ||= `app:${app}`;
       }
 
       if (node.tagName === "img" && typeof node.properties?.src === "string") {

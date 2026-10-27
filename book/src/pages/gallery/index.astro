@@ -1,0 +1,67 @@
+---
+import type { ImageMetadata } from "astro";
+import Base from "../../layouts/Base.astro";
+import { allApps, appHref, chapterName } from "../../lib/apps";
+import { withBase } from "../../lib/paths";
+
+const apps = await allApps();
+
+// Made by scripts/app-thumbnails.mjs; a card without one shows a blank panel.
+const images = import.meta.glob<{ default: ImageMetadata }>("../../assets/thumbnails/*.webp", {
+  eager: true,
+});
+function thumbnail(slug: string, variant: "light" | "dark") {
+  const image = images[`../../assets/thumbnails/${slug}-${variant}.webp`]?.default;
+  if (!image) console.warn(`No ${variant} thumbnail for the ${slug} app; run \`npm run thumbnails -- ${slug}\`.`);
+  return image;
+}
+---
+
+<Base
+  title="Interactive apps"
+  chapterTitle="Interactive apps"
+  description="Interactive figures from the book, each on a page of its own."
+>
+  <main class="apps-gallery" id="main">
+    <h1 class="chapter-title">Interactive apps</h1>
+    <p class="apps-intro">
+      The book’s interactive figures, each on a page of its own. Open one to explore it at full size,
+      or follow its link to where it appears in the text.
+    </p>
+    <ul class="app-grid">
+      {
+        apps.map((app) => (
+          <li>
+            <article class="app-card">
+              <div class="app-thumb">
+                {(["light", "dark"] as const).map((variant) => {
+                  const image = thumbnail(app.slug, variant);
+                  return (
+                    image && (
+                      <img
+                        class={variant}
+                        src={image.src}
+                        alt=""
+                        width={image.width}
+                        height={image.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )
+                  );
+                })}
+              </div>
+              <div class="app-card-body">
+                <h2>
+                  <a href={withBase(appHref(app.slug))}>{app.title}</a>
+                </h2>
+                <p>{app.description}</p>
+                {app.location && <p class="app-card-chapter">{chapterName(app.location.chapter)}</p>}
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Base>

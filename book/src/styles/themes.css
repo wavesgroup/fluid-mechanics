@@ -1,4 +1,6 @@
-/* Theme tokens. Applied via html[data-theme]. */
+/* Theme tokens. Applied via html[data-theme].
+   Dark themes also set --light-only and --dark-only: display values for
+   pictures made for a light or a dark page, such as the app thumbnails. */
 
 html[data-theme="paper"] {
   color-scheme: light;
@@ -47,6 +49,8 @@ html[data-theme="solarized-light"] {
 
 html[data-theme="ink"] {
   color-scheme: dark;
+  --light-only: none;
+  --dark-only: block;
   --bg: #161310;
   --fg: #e7dfd2;
   --muted: #b3a894;
@@ -62,6 +66,8 @@ html[data-theme="ink"] {
 
 html[data-theme="nord"] {
   color-scheme: dark;
+  --light-only: none;
+  --dark-only: block;
   --bg: #2e3440;
   --fg: #eceff4;
   --muted: #d8dee9;
@@ -77,6 +83,8 @@ html[data-theme="nord"] {
 
 html[data-theme="solarized-dark"] {
   color-scheme: dark;
+  --light-only: none;
+  --dark-only: block;
   --bg: #002b36;
   --fg: #eee8d5;
   --muted: #93a1a1;
