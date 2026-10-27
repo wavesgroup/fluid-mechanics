@@ -27,6 +27,9 @@ const registry: Record<string, Loader> = {
   "python-playground": () => load(import("./PythonPlayground.svelte")),
 };
 
+/** Every interactive this can load, for the build to check lib/apps.ts against. */
+export const interactiveNames = Object.keys(registry);
+
 async function load(mod: Promise<{ default: Component }>): Promise<Component> {
   return (await mod).default;
 }
@@ -75,7 +78,7 @@ function addTools(node: HTMLElement, name: string): () => void {
   link.href = withBase(`/gallery/${name}`);
   link.target = "_blank";
   link.innerHTML = `${OPEN_ICON}<span>Open</span>`;
-  link.setAttribute("aria-label", `Open ${title} in its own page`);
+  link.setAttribute("aria-label", `Open ${title} in its own page (opens in a new tab)`);
   link.title = "Open in its own page";
   tools.append(link);
   node.append(tools);

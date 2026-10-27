@@ -20,7 +20,18 @@ export function collectLabels(chaptersDir) {
       number,
     };
   });
-  metas.sort((a, b) => a.order - b.order);
+  return labelChapters(metas);
+}
+
+/**
+ * Assign equation / figure / listing numbers to `chapters`, given each one's
+ * Markdown source as `raw`, and collect the section labels.
+ *
+ * @param {{ slug: string; raw: string; order: number; number: string | null }[]} chapters
+ * @returns {Record<string, { slug: string; kind: string; display: string }>}
+ */
+export function labelChapters(chapters) {
+  const metas = [...chapters].sort((a, b) => a.order - b.order);
 
   const map = {};
   for (const ch of metas) {

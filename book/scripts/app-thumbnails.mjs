@@ -4,7 +4,7 @@
  * src/assets/thumbnails/<slug>-light.webp and <slug>-dark.webp.
  *
  * Run it on a fresh build, with Playwright and its Chromium installed (they are
- * not dependencies of the book):
+ * not dependencies of the book; sharp, which it also uses, comes with Astro):
  *
  *   npm i --no-save playwright && npx playwright install chromium
  *   npm run build

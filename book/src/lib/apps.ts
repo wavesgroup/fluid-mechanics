@@ -1,5 +1,7 @@
 import { allChapters, type Chapter } from "./nav";
 import { withBase } from "./paths";
+import { interactiveNames } from "../interactives/register";
+import { labelChapters } from "../plugins/collect-labels.mjs";
 
 /**
  * The interactive apps, each of which also has a page of its own at
@@ -156,15 +158,29 @@ export function appHref(slug: string): string {
   return `/gallery/${slug}`;
 }
 
+// A slot holds no nested <div>: its contents are a static <img> or the
+// playground's starter <pre>, so the first </div> closes it.
 const SLOT_RE = /<div class="interactive-slot"([^>]*)>([\s\S]*?)<\/div>/g;
-const FIGURE_RE = /<figure class="book-figure"[^>]*>/g;
+const IN_FIGURE_RE = /<figure class="book-figure"([^>]*)>\s*$/;
 
 /** Every app with its place in the book, in the order the book uses them. */
 export async function allApps(): Promise<App[]> {
+  const unknown = APPS.filter((app) => !interactiveNames.includes(app.slug));
+  if (unknown.length) {
+    const names = unknown.map((app) => `"${app.slug}"`).join(", ");
+    throw new Error(`src/lib/apps.ts lists ${names}, which src/interactives/register.ts cannot load.`);
+  }
+
   const info = new Map(APPS.map((app) => [app.slug, app]));
   const found = new Map<string, AppLocation>();
+  const chapters = await allChapters();
+  // Figure numbers as the book shows them. The body has no front matter, which
+  // only the section labels read.
+  const labels = labelChapters(
+    chapters.map((ch) => ({ slug: ch.id, raw: ch.body ?? "", order: ch.data.order, number: ch.data.number })),
+  );
 
-  for (const chapter of await allChapters()) {
+  for (const chapter of chapters) {
     const body = chapter.body ?? "";
     for (const m of body.matchAll(SLOT_RE)) {
       const slug = m[1].match(/\bdata-interactive="([^"]+)"/)?.[1];
@@ -174,16 +190,14 @@ export async function allApps(): Promise<App[]> {
           `The ${chapter.id} chapter uses the interactive "${slug}", which is missing from src/lib/apps.ts.`,
         );
       }
-      const before = body.slice(0, m.index);
-      // Numbered as in plugins/collect-labels.mjs.
-      const inFigure = /<figure class="book-figure"[^>]*>\s*$/.test(before);
-      const count = before.match(FIGURE_RE)?.length ?? 0;
-      const prefix = chapter.data.number;
+      const figureId = body.slice(0, m.index).match(IN_FIGURE_RE)?.[1].match(/\bid="([^"]+)"/)?.[1];
+      // Unless the slot has an id of its own, plugins/rehype-book.mjs gives the
+      // first one for each app in a chapter this one.
+      const id = m[1].match(/\bid="([^"]+)"/)?.[1] ?? `app:${slug}`;
       found.set(slug, {
         chapter,
-        // The id comes from plugins/rehype-book.mjs.
-        href: `/${chapter.id}#app:${slug}`,
-        figure: inFigure ? (prefix ? `${prefix}.${count}` : String(count)) : null,
+        href: `/${chapter.id}#${id}`,
+        figure: (figureId && labels[figureId]?.display) || null,
         fallback: m[2].trim().replace(/\bsrc="(\/[^"]*)"/g, (_, src) => `src="${withBase(src)}"`),
       });
     }

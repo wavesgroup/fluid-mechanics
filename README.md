@@ -48,7 +48,8 @@ and navigate to it at localhost:4321.
 Each interactive figure in the book also has a page of its own, linked from the
 gallery at `/gallery`.
 To add one, list it in `book/src/lib/apps.ts` and make its gallery thumbnails
-from a fresh build (this needs Playwright, which is not a dependency of the book):
+from a fresh build (this needs Playwright, which is not a dependency of the book,
+and sharp, which comes with Astro):
 
 ```
 npm i --no-save playwright && npx playwright install chromium
