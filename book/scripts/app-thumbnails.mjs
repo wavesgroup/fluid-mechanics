@@ -1,6 +1,6 @@
 /**
  * Screenshot each interactive app on its own page for its card in the gallery
- * (src/pages/apps/index.astro), in a light and a dark theme, into
+ * (src/pages/gallery.astro), in a light and a dark theme, into
  * src/assets/thumbnails/<slug>-light.webp and <slug>-dark.webp.
  *
  * Run it on a fresh build, with Playwright and its Chromium installed (they are
@@ -84,7 +84,7 @@ try {
     deviceScaleFactor: SCALE,
   });
   const gallery = await context.newPage();
-  await gallery.goto(new URL("apps/", base).href);
+  await gallery.goto(new URL("gallery/", base).href);
   const all = await gallery.$$eval(".app-card h2 a", (links) =>
     links.map((a) => a.pathname.replace(/\/$/, "").split("/").pop()),
   );

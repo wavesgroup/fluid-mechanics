@@ -1,17 +1,17 @@
 ---
 import type { ImageMetadata } from "astro";
-import Base from "../../layouts/Base.astro";
-import { allApps, appHref, chapterName } from "../../lib/apps";
-import { withBase } from "../../lib/paths";
+import Base from "../layouts/Base.astro";
+import { allApps, appHref, chapterName } from "../lib/apps";
+import { withBase } from "../lib/paths";
 
 const apps = await allApps();
 
 // Made by scripts/app-thumbnails.mjs; a card without one shows a blank panel.
-const images = import.meta.glob<{ default: ImageMetadata }>("../../assets/thumbnails/*.webp", {
+const images = import.meta.glob<{ default: ImageMetadata }>("../assets/thumbnails/*.webp", {
   eager: true,
 });
 function thumbnail(slug: string, variant: "light" | "dark") {
-  const image = images[`../../assets/thumbnails/${slug}-${variant}.webp`]?.default;
+  const image = images[`../assets/thumbnails/${slug}-${variant}.webp`]?.default;
   if (!image) console.warn(`No ${variant} thumbnail for the ${slug} app; run \`npm run thumbnails -- ${slug}\`.`);
   return image;
 }
