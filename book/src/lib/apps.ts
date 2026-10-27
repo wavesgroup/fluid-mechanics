@@ -3,7 +3,7 @@ import { withBase } from "./paths";
 
 /**
  * The interactive apps, each of which also has a page of its own at
- * /apps/<slug> and a card in the gallery at /gallery. The slug is the name the
+ * /gallery/<slug> and a card in the gallery at /gallery. The slug is the name the
  * chapters use for it, as in `<div class="interactive-slot" data-interactive="slug">`,
  * and every interactive used in a chapter must be listed here.
  *
@@ -153,7 +153,7 @@ export interface App extends AppInfo {
 }
 
 export function appHref(slug: string): string {
-  return `/apps/${slug}`;
+  return `/gallery/${slug}`;
 }
 
 const SLOT_RE = /<div class="interactive-slot"([^>]*)>([\s\S]*?)<\/div>/g;

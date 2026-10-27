@@ -63,7 +63,7 @@ const OPEN_ICON =
 
 /**
  * The controls in a hydrated slot's corner: a link to the app's own page
- * (pages/apps/[app].astro, which every interactive has) and, if the slot opts
+ * (pages/gallery/[app].astro, which every interactive has) and, if the slot opts
  * in, the expand button.
  */
 function addTools(node: HTMLElement, name: string): () => void {
@@ -72,7 +72,7 @@ function addTools(node: HTMLElement, name: string): () => void {
   const title = node.querySelector(".interactive-title")?.textContent?.trim() || "this interactive figure";
   const link = document.createElement("a");
   link.className = "interactive-open";
-  link.href = withBase(`/apps/${name}`);
+  link.href = withBase(`/gallery/${name}`);
   link.target = "_blank";
   link.innerHTML = `${OPEN_ICON}<span>Open</span>`;
   link.setAttribute("aria-label", `Open ${title} in its own page`);

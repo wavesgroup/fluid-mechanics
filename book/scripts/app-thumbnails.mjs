@@ -1,6 +1,6 @@
 /**
  * Screenshot each interactive app on its own page for its card in the gallery
- * (src/pages/gallery.astro), in a light and a dark theme, into
+ * (src/pages/gallery/index.astro), in a light and a dark theme, into
  * src/assets/thumbnails/<slug>-light.webp and <slug>-dark.webp.
  *
  * Run it on a fresh build, with Playwright and its Chromium installed (they are
@@ -55,7 +55,7 @@ async function capture(context, base, slug, theme) {
   const shot = { ...DEFAULT, ...SHOTS[slug] };
   const page = await context.newPage();
   await page.addInitScript((t) => localStorage.setItem("fm-theme", t), theme);
-  await page.goto(new URL(`apps/${slug}/`, base).href, { waitUntil: "networkidle" });
+  await page.goto(new URL(`gallery/${slug}/`, base).href, { waitUntil: "networkidle" });
   await page.waitForSelector('.interactive-slot[data-hydrated="true"]');
   if (shot.click) await page.getByRole("button", { name: shot.click, exact: true }).click();
   const target = page.locator(`.app-stage :is(${shot.selector})`).first();

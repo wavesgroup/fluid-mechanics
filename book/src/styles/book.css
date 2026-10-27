@@ -1366,8 +1366,8 @@ html.has-interactive-dialog {
   outline-offset: 2px;
 }
 
-/* The gallery of interactive apps (pages/gallery.astro) and their own
-   pages (pages/apps/[app].astro). */
+/* The gallery of interactive apps (pages/gallery/index.astro) and their own
+   pages (pages/gallery/[app].astro). */
 .apps-gallery {
   max-width: 76rem;
   margin: 0 auto;
