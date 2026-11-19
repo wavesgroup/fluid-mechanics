@@ -1357,6 +1357,165 @@ html.has-interactive-dialog {
   }
 }
 
+/* The cross-sections under a wave (interactives/WaveField.svelte): the plot is
+   only looked at, so a touch on it scrolls the page. */
+.wave-interactive .wave-plot svg {
+  cursor: default;
+  touch-action: auto;
+  font-family: var(--font-ui);
+}
+
+.wave-interactive .wave-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1.1rem;
+  margin: 0.6rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.wave-interactive .wave-ramp {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+.wave-interactive .wave-ramp-bar {
+  display: inline-grid;
+  gap: 0.1rem;
+  width: 12rem;
+}
+
+/* One pixel per color band. */
+.wave-interactive .wave-ramp-bar canvas {
+  display: block;
+  width: 100%;
+  height: 0.6rem;
+  border: 1px solid var(--rule);
+  image-rendering: pixelated;
+}
+
+.wave-interactive .wave-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.wave-interactive .wave-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wave-interactive .wave-key i {
+  display: inline-block;
+  width: 1.1rem;
+  height: 2px;
+}
+
+.wave-interactive .wave-key i.dashed {
+  height: 0;
+  border-top: 1.5px dashed;
+  opacity: 0.7;
+}
+
+.wave-interactive .wave-key i.dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+}
+
+.wave-interactive .wave-key i.ring {
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 1px solid;
+  border-radius: 50%;
+  opacity: 0.55;
+}
+
+.wave-interactive .readout {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.wave-interactive .wave-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.5rem;
+  margin: 0.85rem 0 0.2rem;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+}
+
+.wave-interactive .wave-group {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.wave-interactive .wave-label {
+  color: var(--muted);
+}
+
+.wave-interactive .wave-note {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Expanded, or on its own page: the two velocity panels go on the left, as
+   large as the height allows, with the controls in a column beside them. The
+   potential's single strip keeps the full width, with its controls in two
+   columns below. */
+@media (min-width: 56rem) {
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities {
+    display: grid;
+    grid-template-columns: minmax(0, calc(var(--stage-h) * var(--wave-aspect))) minmax(22rem, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "main head"
+      "main side"
+      "note side";
+    column-gap: 1.5rem;
+    align-content: start;
+    align-content: safe center;
+  }
+
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities :is(.wave-head, .wave-side) {
+    max-width: 30rem;
+  }
+
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities .wave-head {
+    grid-area: head;
+  }
+
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities .wave-main {
+    grid-area: main;
+  }
+
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities .wave-side {
+    grid-area: side;
+  }
+
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities .wave-note {
+    grid-area: note;
+  }
+
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities .rotation-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(.interactive-dialog, .app-stage.is-wide) .wave-potential .wave-side {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2.5rem;
+    align-items: start;
+  }
+}
+
 .interactive .eos-canvas {
   cursor: crosshair;
 }
@@ -1758,7 +1917,10 @@ html.has-interactive-dialog {
   .book-figure .swe-interactive .swe-eqs,
   .book-figure .swe-interactive .swe-options,
   .book-figure .swe-interactive .swe-note,
-  .book-figure .swe-interactive .vec-hit {
+  .book-figure .swe-interactive .vec-hit,
+  .book-figure .wave-interactive .vector-callout,
+  .book-figure .wave-interactive .wave-options,
+  .book-figure .wave-interactive .wave-note {
     display: none !important;
   }
 

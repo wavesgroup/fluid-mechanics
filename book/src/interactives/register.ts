@@ -9,7 +9,9 @@ type Loader = () => Promise<Component>;
  * uses — the Python playground drags in CodeMirror, which no other page needs.
  */
 const registry: Record<string, Loader> = {
+  "wave-potential": () => load(import("./WavePotential.svelte")),
   "wave-dispersion": () => load(import("./WaveDispersion.svelte")),
+  "wave-velocities": () => load(import("./WaveVelocities.svelte")),
   "parcel-oscillation": () => load(import("./ParcelOscillation.svelte")),
   "channel-flow": () => load(import("./ChannelFlow.svelte")),
   "dot-product": () => load(import("./DotProduct.svelte")),

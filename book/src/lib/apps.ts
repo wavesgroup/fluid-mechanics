@@ -132,10 +132,24 @@ plt.show()
       "The parabolic velocity profile of laminar flow between two plates, set by the channel width and the wall stress.",
   },
   {
+    slug: "wave-potential",
+    title: "Wave velocity potential",
+    description:
+      "The velocity potential under a deep-water wave, traveling with it as you set its amplitude, wavenumber or frequency, and gravity.",
+    wide: true,
+  },
+  {
     slug: "wave-dispersion",
     title: "Wave dispersion",
     description:
       "The dispersion relation of surface gravity waves, from deep to shallow water as the depth changes.",
+  },
+  {
+    slug: "wave-velocities",
+    title: "Wave velocities and particle paths",
+    description:
+      "Horizontal and vertical velocities under a deep-water wave, with particles whose trails show them drifting slowly with the wave.",
+    wide: true,
   },
 ];
 
