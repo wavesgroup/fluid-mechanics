@@ -706,10 +706,12 @@ of the wave.
 The potential is largest at the surface and decays exponentially with depth.
 
 <figure class="book-figure" id="fig:wave_potential">
-  <img src="/figures/fig_wave_potential.png" alt="Wave elevation (black line) and velocity potential (color) for a linear wave with amplitude m and wavenumber rad m, in d" />
+  <div class="interactive-slot" data-interactive="wave-potential" data-expandable>
+    <img src="/figures/fig_wave_potential.png" alt="Wave elevation (solid line) and velocity potential (color) under one wavelength of a linear wave. The potential is positive under the front face of the wave, negative under its back face, and decays with depth." />
+  </div>
   <figcaption>
 
-Wave elevation (black line) and velocity potential (color) for a linear wave with amplitude $a = 0.1$ m and wavenumber $k = 1$ rad m$^{-1}$, in deep water ($h = 100$ m). The mean water level ($z = 0$) is indicated by the horizontal dashed line. The wave is propagating from left to right.
+Wave elevation (solid line) and velocity potential (color) for a linear wave with amplitude $a = 0.1$ m and wavenumber $k = 1$ rad m$^{-1}$, in deep water ($h = 100$ m). The mean water level ($z = 0$) is indicated by the horizontal dashed line. The wave is propagating from left to right. In the interactive version, the wave travels in real time and in the deep water limit (Eq. <a class="eqref" data-key="eq:deep_water_wave_potential"></a>). Set its amplitude $a$, its wavenumber $k$ or, alternatively, its frequency $f = \omega / 2\pi$, and the gravitational acceleration $g$, and pause, resume, or restart the animation. The static fallback shows the wave at one instant, against the phase $\psi = kx - \omega t$.
 
   </figcaption>
 </figure>
@@ -896,10 +898,12 @@ and wavenumber $k = 1$ rad m$^{-1}$, in deep water ($h = 100$ m), are shown in
 Fig. <a class="ref" data-key="fig:wave_velocities"></a>.
 
 <figure class="book-figure" id="fig:wave_velocities">
-  <img src="/figures/fig_wave_velocities.png" alt="Wave elevation (black line) and horizontal (top) and vertical (bottom) velocities (color) for a linear wave with amplitu" />
+  <div class="interactive-slot" data-interactive="wave-velocities" data-expandable>
+    <img src="/figures/fig_wave_velocities.png" alt="Wave elevation (solid line) and horizontal (top) and vertical (bottom) velocities (color) under one wavelength of a linear wave, with circular particle orbits that shrink with depth. The horizontal velocity is positive under the crest and negative under the trough; the vertical velocity is positive under the front face of the wave and negative under its back face." />
+  </div>
   <figcaption>
 
-Wave elevation (black line) and horizontal (top) and vertical (bottom) velocities (color) for a linear wave with amplitude $a = 0.1$ m and wavenumber $k = 1$ rad m$^{-1}$, in deep water ($h = 100$ m). Thin lines indicate the water particle trajectories.
+Wave elevation (solid line) and horizontal (top) and vertical (bottom) velocities (color) for a linear wave with amplitude $a = 0.1$ m and wavenumber $k = 1$ rad m$^{-1}$, in deep water ($h = 100$ m). Thin circles indicate the water particle trajectories to the first order. In the interactive version, the wave travels in real time, and material particles (dots) released under it move with the velocities of Eqs. <a class="eqref" data-key="eq:wave_horizontal_velocity"></a>-<a class="eqref" data-key="eq:wave_vertical_velocity"></a> evaluated at the particles' own positions, leaving trails behind them. Their orbits do not quite close, so the particles slowly drift in the direction of the wave, which is the mean Lagrangian velocity derived in the next section. Set the amplitude $a$, the wavenumber $k$ or, alternatively, the frequency $f = \omega / 2\pi$, and the gravitational acceleration $g$; turn the particles on or off; and pause, resume, or restart the simulation.
 
   </figcaption>
 </figure>
@@ -959,6 +963,9 @@ horizontal velocity will be non-zero because the particles move forward a larger
 distance than backward over the course of one period.
 This mean Lagrangian velocity is called the
 <em>Stokes drift</em>.
+It can be seen in the interactive version of Fig. <a class="ref" data-key="fig:wave_velocities"></a>,
+where the trails of the particles do not close on themselves but advance a
+little with each wave period.
 We can find the expression for this mean residual drift by first recognizing
 that we can approximate the velocity at a particle position $(x+\zeta, z+\xi)$
 to the first order as:
@@ -1062,10 +1069,12 @@ Superposing two waves with different wavenumbers leads to the formation
 of wave groups (Fig. <a class="ref" data-key="fig:wave_group"></a>).
 
 <figure class="book-figure" id="fig:wave_group">
-  <img src="/figures/fig_wave_group.png" alt="Superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m." />
+  <div class="interactive-slot" data-interactive="wave-group" data-expandable>
+    <img src="/figures/fig_wave_group.png" alt="Surface elevation over 200 m for the superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m: the waves swell and fade in groups about 63 m apart." />
+  </div>
   <figcaption>
 
-Superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m.
+Superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m. In the interactive version, the elevation evolves in time as the sum of its components, each a linear wave in deep water that propagates at its own phase speed. Set the amplitude $a_i$ and the wavenumber $k_i$ or, alternatively, the frequency $f_i = \omega_i / 2\pi$ of each component, and add components to form shorter groups. The dashed lines are the envelope of the groups, and the two markers travel at the phase speed $C_p$ and at the group speed $C_g$ (Eq. <a class="eqref" data-key="eq:group_speed"></a>).
 
   </figcaption>
 </figure>

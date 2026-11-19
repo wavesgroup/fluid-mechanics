@@ -49,6 +49,8 @@ const SHOTS = {
   "python-playground": { selector: ".python-editor", fit: "cover", position: "left top" },
   "geostrophic-flow": { fit: "cover", wait: 4000 },
   "shallow-water": { fit: "cover", wait: 20000 },
+  "wave-velocities": { fit: "cover", position: "left", wait: 12000 },
+  "wave-group": { fit: "cover", position: "left" },
 };
 
 async function capture(context, base, slug, theme) {
