@@ -1436,8 +1436,86 @@ html.has-interactive-dialog {
   opacity: 0.55;
 }
 
+.wave-interactive .wave-key i.mark {
+  width: 0.6rem;
+  height: 0.5rem;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
 .wave-interactive .readout {
   grid-template-columns: auto minmax(0, 1fr);
+}
+
+/* The components of a wave group (interactives/WaveGroup.svelte), a row of
+   settings each. */
+.wave-interactive .group-rows {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.85rem 0 0.2rem;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+}
+
+.wave-interactive .group-row {
+  display: grid;
+  grid-template-columns: 1.1rem repeat(3, minmax(0, 1fr)) 1.7rem;
+  column-gap: 0.9rem;
+  align-items: center;
+}
+
+.wave-interactive .group-heads {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.wave-interactive .group-n {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.wave-interactive .group-row label {
+  gap: 0.1rem 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.wave-interactive .group-row label > span:first-child {
+  font-style: italic;
+}
+
+.wave-interactive .group-row sub {
+  font-style: normal;
+}
+
+.wave-interactive .group-remove {
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  line-height: 1;
+}
+
+/* On a narrow screen, a component's three settings stack. */
+@media (max-width: 34rem) {
+  .wave-interactive .group-heads {
+    display: none;
+  }
+
+  .wave-interactive .group-row {
+    grid-template-columns: 1.1rem minmax(0, 1fr) 1.7rem;
+    row-gap: 0.25rem;
+    align-items: start;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .wave-interactive .group-row label {
+    grid-column: 2;
+  }
+
+  .wave-interactive .group-row .group-remove {
+    grid-column: 3;
+    grid-row: 1;
+  }
 }
 
 .wave-interactive .wave-options {
@@ -1468,8 +1546,8 @@ html.has-interactive-dialog {
 
 /* Expanded, or on its own page: the two velocity panels go on the left, as
    large as the height allows, with the controls in a column beside them. The
-   potential's single strip keeps the full width, with its controls in two
-   columns below. */
+   potential's single strip and the wave groups keep the full width, with
+   their controls in two columns below. */
 @media (min-width: 56rem) {
   :is(.interactive-dialog, .app-stage.is-wide) .wave-velocities {
     display: grid;
@@ -1508,7 +1586,7 @@ html.has-interactive-dialog {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  :is(.interactive-dialog, .app-stage.is-wide) .wave-potential .wave-side {
+  :is(.interactive-dialog, .app-stage.is-wide) :is(.wave-potential, .wave-groups) .wave-side {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 2.5rem;
@@ -1920,6 +1998,7 @@ html.has-interactive-dialog {
   .book-figure .swe-interactive .vec-hit,
   .book-figure .wave-interactive .vector-callout,
   .book-figure .wave-interactive .wave-options,
+  .book-figure .wave-interactive .group-rows,
   .book-figure .wave-interactive .wave-note {
     display: none !important;
   }

@@ -151,6 +151,13 @@ plt.show()
       "Horizontal and vertical velocities under a deep-water wave, with particles whose trails show them drifting slowly with the wave.",
     wide: true,
   },
+  {
+    slug: "wave-group",
+    title: "Wave groups",
+    description:
+      "Add up wave components of your choosing and watch the crests run through the groups they form, at twice the speed of the groups.",
+    wide: true,
+  },
 ];
 
 /** Where an app appears in the book. */

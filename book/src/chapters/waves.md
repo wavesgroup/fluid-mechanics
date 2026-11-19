@@ -1069,10 +1069,12 @@ Superposing two waves with different wavenumbers leads to the formation
 of wave groups (Fig. <a class="ref" data-key="fig:wave_group"></a>).
 
 <figure class="book-figure" id="fig:wave_group">
-  <img src="/figures/fig_wave_group.png" alt="Superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m." />
+  <div class="interactive-slot" data-interactive="wave-group" data-expandable>
+    <img src="/figures/fig_wave_group.png" alt="Surface elevation over 200 m for the superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m: the waves swell and fade in groups about 63 m apart." />
+  </div>
   <figcaption>
 
-Superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m.
+Superposition of two waves with wavenumbers 1 and 1.1 rad/m and amplitudes of 0.1 m. In the interactive version, the elevation evolves in time as the sum of its components, each a linear wave in deep water that propagates at its own phase speed. Set the amplitude $a_i$ and the wavenumber $k_i$ or, alternatively, the frequency $f_i = \omega_i / 2\pi$ of each component, and add components to form shorter groups. The dashed lines are the envelope of the groups, and the two markers travel at the phase speed $C_p$ and at the group speed $C_g$ (Eq. <a class="eqref" data-key="eq:group_speed"></a>).
 
   </figcaption>
 </figure>

@@ -12,6 +12,7 @@ const registry: Record<string, Loader> = {
   "wave-potential": () => load(import("./WavePotential.svelte")),
   "wave-dispersion": () => load(import("./WaveDispersion.svelte")),
   "wave-velocities": () => load(import("./WaveVelocities.svelte")),
+  "wave-group": () => load(import("./WaveGroup.svelte")),
   "parcel-oscillation": () => load(import("./ParcelOscillation.svelte")),
   "channel-flow": () => load(import("./ChannelFlow.svelte")),
   "dot-product": () => load(import("./DotProduct.svelte")),
